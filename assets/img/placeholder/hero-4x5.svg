@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" role="img" aria-label="Pladsholder for hero-billede">
+  <rect width="480" height="600" fill="#F3E8DB"/>
+  <rect x="0.5" y="0.5" width="479" height="599" fill="none" stroke="#A3A3A3" stroke-opacity="0.55"/>
+  <g fill="none" stroke="#141414" stroke-opacity="0.22" stroke-width="2">
+    <path d="M28 28h30M28 28v30"/>
+    <path d="M452 28h-30M452 28v30"/>
+    <path d="M28 572h30M28 572v-30"/>
+    <path d="M452 572h-30M452 572v-30"/>
+  </g>
+  <text x="240" y="296" text-anchor="middle" font-family="'Instrument Serif', Georgia, serif" font-size="46" fill="#141414">Revigora</text>
+  <text x="240" y="326" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" letter-spacing="3" fill="#A3A3A3">HERO-BILLEDE &#183; 4 : 5</text>
+</svg>

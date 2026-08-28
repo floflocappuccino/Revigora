@@ -1,0 +1,12 @@
+# Third-party reference material (full HTML dumps of other sites) — kept local only
+website design reference/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Node tooling, if added later
+node_modules/
