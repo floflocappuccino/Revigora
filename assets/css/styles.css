@@ -117,23 +117,10 @@ button { font-family: inherit; color: inherit; }
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
   color: var(--color-text-primary);
 }
-.brand__mark {
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-button);
-  background: var(--color-text-primary);
-  color: var(--color-bg-linen);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  line-height: 1;
-}
-.brand__word { font-family: var(--font-display); font-size: 1.25rem; letter-spacing: .01em; }
+.brand__logo { display: block; height: 24px; width: auto; }
 
 /* =============================== Buttons =============================== */
 
@@ -560,7 +547,7 @@ button { font-family: inherit; color: inherit; }
 
 /* ======================= 5 · How it works =========================== */
 
-.steps { display: grid; }
+.steps { display: grid; list-style: none; padding-left: 0; }
 .step { position: relative; padding: 0 0 32px 40px; }
 .step:last-child { padding-bottom: 0; }
 .step::before {
@@ -666,7 +653,7 @@ button { font-family: inherit; color: inherit; }
   color: var(--color-silver);
 }
 .brand--footer { color: #FFF; }
-.brand--footer .brand__mark { background: var(--color-bg-linen); color: var(--color-text-primary); }
+.brand--footer .brand__logo { height: 28px; }
 .site-footer__tagline { margin: 14px 0 6px; color: #FFF; font-family: var(--font-display); font-size: 1.125rem; }
 .site-footer__copy, .site-footer__flag { font-size: .8125rem; color: var(--color-silver); }
 @media (min-width: 768px) {

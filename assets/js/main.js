@@ -93,13 +93,27 @@
   var currentStep = 1;
   var submitDefaultLabel = submitBtn ? submitBtn.textContent : 'Send';
 
+  // Set when a "direct" trigger (membership) opens the modal: the panel picker
+  // is skipped entirely and the flow is framed as 2 steps with no back button.
+  // Other pre-selected panels also skip the picker but keep the 3-step framing.
+  var twoStepMode = false;
+
   function showStep(n) {
     currentStep = n;
     steps.forEach(function (fs) {
       fs.hidden = Number(fs.dataset.step) !== n;
     });
-    if (progress) progress.textContent = 'Trin ' + n + ' af 3';
+    if (progress) {
+      progress.textContent = twoStepMode
+        ? 'Trin ' + (n - 1) + ' af 2'
+        : 'Trin ' + n + ' af 3';
+    }
     var active = steps[n - 1];
+    var legend = active.querySelector('.modal__title');
+    if (legend) {
+      if (!legend.id) legend.id = 'wl-title-' + n;
+      sheet.setAttribute('aria-labelledby', legend.id);
+    }
     var focusTarget = Array.prototype.slice
       .call(active.querySelectorAll('input, select, button'))
       .filter(function (el) { return !el.disabled && el.offsetParent !== null; })[0];
@@ -123,7 +137,7 @@
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 
-  function openModal(intent, trigger) {
+  function openModal(intent, trigger, direct) {
     lastFocused = trigger || document.activeElement;
     modal.hidden = false;
     root.style.overflow = 'hidden';
@@ -132,12 +146,15 @@
     errorEl.hidden = true;
     if (copiedEl) copiedEl.hidden = true;
     intentInputs.forEach(function (i) { i.checked = false; });
+    var hasIntent = false;
     if (intent) {
       var pre = intentInputs.filter(function (i) { return i.value === intent; })[0];
-      if (pre) pre.checked = true;
+      if (pre) { pre.checked = true; hasIntent = true; }
     }
+    twoStepMode = hasIntent && !!direct;
+    if (prevBtn) prevBtn.hidden = twoStepMode;
     if (nextBtn) nextBtn.disabled = !modal.querySelector('input[name="intent"]:checked');
-    showStep(1);
+    showStep(hasIntent ? 2 : 1);
 
     document.addEventListener('keydown', onKeydown, true);
     track(window.matchMedia('(min-width: 768px)').matches ? 'desktop_modal_open' : 'mobile_modal_open', { intent: intent || null });
@@ -153,7 +170,7 @@
   /* ---- triggers -------------------------------------------------------- */
   document.querySelectorAll('[data-open-waitlist]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      openModal(btn.getAttribute('data-intent') || '', btn);
+      openModal(btn.getAttribute('data-intent') || '', btn, btn.hasAttribute('data-direct'));
     });
   });
   modal.querySelectorAll('[data-close-waitlist]').forEach(function (btn) {
