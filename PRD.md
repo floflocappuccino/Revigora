@@ -1,4 +1,3 @@
-
 # Product Requirements Document (PRD): Revigora Landing Page & Waitlist Architecture
 
 ## 1. Executive Summary & Brand Foundation
@@ -10,7 +9,7 @@ Revigora is a premium Direct-to-Consumer (DTC) biomarker testing and proactive h
 ### 1.2 Target Persona (Ideal Customer Profile)
 
 * **Demographics:** Male-skewed (70% male, 30% female focus), ages 25–45, residing in Denmark/Nordics. Mobile-first browser behavior (65%+ traffic via iOS/Android).
-* **Psychographics:** High-performers, biohackers, endurance athletes, corporate executives, and longevity-focused individuals. They value data-driven optimization, energy efficiency, cognitive clarity, and physical longevity on the go.
+* **Psychographics:** Fitness enthusiasts, high-performers in their respective domains (finance, law, tech etc.), biohackers, athletes, corporate executives, and longevity-focused individuals. They value data-driven optimization, energy efficiency, cognitive clarity, and physical longevity on the go.
 * **Pain Points:** Standard Danish healthcare systems only test blood when individuals are clinically ill; high barriers to entry for advanced longevity diagnostics; confusing diagnostic jargon; fragmented testing solutions; poorly formatted mobile health applications.
 
 ### 1.3 Brand Positioning & Tone
@@ -41,7 +40,6 @@ Revigora is a premium Direct-to-Consumer (DTC) biomarker testing and proactive h
   --radius-button: 8px;
   --min-touch-target: 48px;           /* Mobile Accessibility Standard */
 }
-
 ```
 
 ---
@@ -94,7 +92,6 @@ To ensure zero interface degradation on any device, the layout adheres to a mobi
                  │
                  ▼
 [ Touch-Optimized Form Submission → Confirmation Screen + Dynamic Referral Link ]
-
 ```
 
 ---
@@ -204,7 +201,7 @@ To ensure zero interface degradation on any device, the layout adheres to a mobi
 * **Mobile:** Centered 1-column layout. Stacked links with 16px vertical gap for easy thumb tapping.
 * **Elements:**
 * **Brand Column:** Revigora Logo, Tagline (*Proactive Health Intelligence for the Nordics*), © 2026 Revigora ApS.
-* **Location Badge:** 🇩🇰 Designed & Engineered in Copenhagen, Denmark.
+* **Location Badge:** 🇩🇰 Designed & Engineered in Aarhus, Denmark.
 
 ---
 
@@ -219,7 +216,6 @@ To ensure zero interface degradation on any device, the layout adheres to a mobi
 
 ```
 [ Step 1: Intent Selection ] ──► [ Step 2: Contact Info ] ──► [ Step 3: Referral & Position ]
-
 ```
 
 * **Touch Optimizations:**

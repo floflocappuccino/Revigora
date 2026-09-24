@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dine resultater — Revigora</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=1">
+</head>
+<body class="app-body no-js">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+
+  <header class="app-header">
+    <div class="container app-header__inner">
+      <a class="brand" href="resultater.html" aria-label="Revigora">
+        <img class="brand__logo" src="../assets/img/revigora-logo.svg" alt="Revigora" width="66" height="24">
+      </a>
+      <nav class="app-nav" aria-label="App">
+        <a href="resultater.html" aria-current="page">Resultater</a>
+        <a href="#">Protokol</a>
+        <a href="#">Historik</a>
+        <a href="#">Bestil ny test</a>
+      </nav>
+      <div class="avatar" aria-hidden="true">MK</div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="container">
+
+      <div class="page-head">
+        <span class="page-head__eyebrow">Longevity &amp; Healthspan · Prøve taget 12. september 2026</span>
+        <h1 class="page-head__title">Hej Mikkel, her er dit overblik.</h1>
+      </div>
+
+      <section class="summary-tiles" aria-label="Overblik">
+        <div class="tile">
+          <span class="tile__label">Biologisk alder</span>
+          <div class="tile__value"><strong>34,2</strong><span>år</span></div>
+          <p class="tile__note">3,8 år yngre end din faktiske alder på 38.</p>
+        </div>
+        <div class="tile">
+          <span class="tile__label">I optimal zone</span>
+          <div class="tile__value"><strong>42</strong><span>af 45 markører</span></div>
+          <div class="tile__bar"><span style="width:93%"></span></div>
+        </div>
+        <div class="tile">
+          <span class="tile__label">Kræver opmærksomhed</span>
+          <div class="tile__value"><strong class="is-amber">3</strong><span>markører</span></div>
+          <p class="tile__note">2 tæt på grænsen, 1 uden for normalområdet.</p>
+        </div>
+      </section>
+
+      <section class="recap" aria-label="Kort fortalt">
+        <span class="recap__eyebrow">Kort fortalt</span>
+        <p class="recap__statement">Din biologi ser stærk ud for din alder, men tre markører beder om opmærksomhed.</p>
+        <div class="recap__points">
+          <div class="recap__point">
+            <span class="recap__dot" aria-hidden="true"></span>
+            <p><strong>Biologisk alder 34,2 år</strong> — 3,8 år yngre end din faktiske alder.</p>
+          </div>
+          <div class="recap__point">
+            <span class="recap__dot recap__dot--outside" aria-hidden="true"></span>
+            <p><strong>Fasteinsulin er uden for normalområdet</strong> — hovedfokus i din protokol.</p>
+          </div>
+          <div class="recap__point">
+            <span class="recap__dot recap__dot--borderline" aria-hidden="true"></span>
+            <p><strong>D-vitamin og ferritin</strong> er tæt på grænsen — nemme at rette med kost og tilskud.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="results-layout">
+        <div class="markers-column">
+
+          <nav class="chip-row" aria-label="Kategorier" style="padding-bottom:0;">
+            <button type="button" class="chip is-active">Alle · 45</button>
+            <button type="button" class="chip">Hjerte &amp; kredsløb</button>
+            <button type="button" class="chip">Hormoner</button>
+            <button type="button" class="chip">Stofskifte</button>
+            <button type="button" class="chip">Vitaminer &amp; mineraler</button>
+          </nav>
+
+          <div class="markers-card">
+            <div class="markers-card__group">
+              <span class="markers-card__group-label">Kræver opmærksomhed · 3</span>
+              <div class="markers-card__legend"><span><i></i>Optimal zone</span><span><i class="is-dot"></i>Dit resultat</span></div>
+            </div>
+
+            <div class="marker-row">
+              <div class="marker-row__top">
+                <span class="marker-row__name">Fasteinsulin<span class="marker-row__cat">Stofskifte</span></span>
+                <span class="status-pill status-pill--outside">Uden for</span>
+              </div>
+              <div class="marker-row__value">13,9<span>mIE/L</span></div>
+              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--outside" style="left:86%"></span></div>
+              <p class="marker-row__note">Forhøjet fasteinsulin kan være et tidligt tegn på nedsat insulinfølsomhed. Din protokol har tre konkrete tiltag.</p>
+            </div>
+
+            <div class="marker-row">
+              <div class="marker-row__top">
+                <span class="marker-row__name">D-vitamin<span class="marker-row__cat">Vitaminer &amp; mineraler</span></span>
+                <span class="status-pill status-pill--borderline">Grænse</span>
+              </div>
+              <div class="marker-row__value">46<span>nmol/L</span></div>
+              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--borderline" style="left:22%"></span></div>
+              <p class="marker-row__note">Lidt under det optimale niveau, helt typisk efter en dansk sommer. Et D3-tilskud og lidt mere dagslys løfter dig hurtigt.</p>
+            </div>
+
+            <div class="marker-row">
+              <div class="marker-row__top">
+                <span class="marker-row__name">Ferritin<span class="marker-row__cat">Vitaminer &amp; mineraler</span></span>
+                <span class="status-pill status-pill--borderline">Grænse</span>
+              </div>
+              <div class="marker-row__value">38<span>µg/L</span></div>
+              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--borderline" style="left:25%"></span></div>
+              <p class="marker-row__note">Dine jernlagre er på den lave side. Det kan mærkes som lavere energi og langsommere restitution efter træning.</p>
+            </div>
+
+            <div class="markers-card__group">
+              <span class="markers-card__group-label">I optimal zone · 42</span>
+            </div>
+
+            <div class="marker-row">
+              <div class="marker-row__top">
+                <a class="marker-row__name" href="apob.html" style="text-decoration:none; color:inherit;">ApoB<span class="marker-row__cat">Hjerte &amp; kredsløb</span></a>
+                <span class="status-pill status-pill--optimal">Optimal</span>
+              </div>
+              <div class="marker-row__value">0,74<span>g/L</span></div>
+              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot" style="left:48%"></span></div>
+              <p class="marker-row__note">Din ApoB er lav, og det er den stærkeste enkeltmarkør for langsigtet hjertesundhed. Fortsæt som nu.</p>
+            </div>
+
+            <div class="marker-row">
+              <div class="marker-row__top">
+                <span class="marker-row__name">hs-CRP<span class="marker-row__cat">Inflammation</span></span>
+                <span class="status-pill status-pill--optimal">Optimal</span>
+              </div>
+              <div class="marker-row__value">0,6<span>mg/L</span></div>
+              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot" style="left:36%"></span></div>
+              <p class="marker-row__note">Ingen tegn på kronisk lavgradig inflammation. Det er præcis, hvad du vil se.</p>
+            </div>
+
+            <a class="markers-card__footer" href="#">Vis alle 45 markører →</a>
+          </div>
+        </div>
+
+        <aside class="sidebar-column">
+          <div class="dark-card">
+            <div>
+              <p class="dark-card__eyebrow">Din protokol</p>
+              <h2 class="dark-card__title">Tre tiltag, der flytter mest.</h2>
+            </div>
+            <div class="dark-card__step">
+              <span class="dark-card__step-num">01</span>
+              <div><p>D3-tilskud, 2.000 IE dagligt</p><p>Tages med et måltid med fedt. Mål igen om 90 dage.</p></div>
+            </div>
+            <div class="dark-card__step">
+              <span class="dark-card__step-num">02</span>
+              <div><p>Gå 10 minutter efter dagens største måltid</p><p>Det sænker blodsukker og insulinudsving mærkbart.</p></div>
+            </div>
+            <div class="dark-card__step">
+              <span class="dark-card__step-num">03</span>
+              <div><p>Mere jern og C-vitamin i kosten</p><p>Rødt kød, linser og spinat, gerne med citrus til.</p></div>
+            </div>
+            <a class="btn btn--primary btn--block" href="#">Se hele protokollen</a>
+          </div>
+
+          <div class="retest-card">
+            <span class="retest-card__eyebrow">Næste måling</span>
+            <p>Test igen om 90 dage for at se, om dine tiltag virker. Medlemmer får det automatisk.</p>
+            <a href="#">Book ny prøve →</a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer-actions">
+        <a class="btn--outline-sm" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Download PDF
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <nav class="app-tabbar" aria-label="Bundnavigation">
+    <a class="app-tab" href="resultater.html" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      Resultater
+    </a>
+    <a class="app-tab" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6M8 15l2.5 2.5L16 12"/></svg>
+      Protokol
+    </a>
+    <a class="app-tab" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      Historik
+    </a>
+    <a class="app-tab" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Konto
+    </a>
+  </nav>
+
+</body>
+</html>

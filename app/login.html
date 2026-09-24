@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log ind — Revigora</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=1">
+</head>
+<body class="no-js">
+
+  <div class="auth-shell">
+    <div class="auth-form-side">
+      <a class="brand" href="../index.html" aria-label="Revigora forside">
+        <img class="brand__logo" src="../assets/img/revigora-logo.svg" alt="Revigora" width="66" height="24">
+      </a>
+
+      <form class="auth-form" novalidate>
+        <div>
+          <p class="eyebrow" style="margin:0 0 12px;">Log ind</p>
+          <h1>Velkommen tilbage.</h1>
+          <p class="auth-form__intro">Se dine resultater, følg din udvikling og hold din protokol ved lige.</p>
+        </div>
+
+        <button type="button" class="btn btn--ink btn--lg" data-mitid-login>Log ind med MitID</button>
+
+        <div class="auth-divider"><span>eller med e-mail</span></div>
+
+        <div class="field">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" inputmode="email" required>
+        </div>
+        <div class="field">
+          <div class="field-label-row">
+            <label for="login-password">Adgangskode</label>
+            <a href="#">Glemt adgangskode?</a>
+          </div>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--lg">Log ind</button>
+        <p class="auth-alt">Ingen konto endnu? <a href="../index.html" style="font-weight:600; color:var(--color-text-primary);">Kom på ventelisten →</a></p>
+      </form>
+
+      <p class="trust-line">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Krypterede sundhedsdata, opbevaret i EU.
+      </p>
+    </div>
+
+    <div class="auth-photo-side">
+      <img src="../assets/img/package-longevity.jpeg" alt="" loading="lazy" decoding="async">
+    </div>
+  </div>
+
+  <script>
+    // Mockup only — no real authentication. Both login paths just take the
+    // visitor into the app so the flow can be demoed end to end.
+    (function () {
+      'use strict';
+      var DASHBOARD_URL = 'resultater.html';
+      var form = document.querySelector('.auth-form');
+      var mitidBtn = document.querySelector('[data-mitid-login]');
+
+      if (mitidBtn) {
+        mitidBtn.addEventListener('click', function () {
+          window.location.href = DASHBOARD_URL;
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (form.checkValidity()) {
+            window.location.href = DASHBOARD_URL;
+          } else {
+            form.reportValidity();
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
