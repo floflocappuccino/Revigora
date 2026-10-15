@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Revigora — Proaktiv sundhedsintelligens for Norden</title>
-  <meta name="description" content="Avanceret testning af blodbiomarkører, skræddersyede longevity-indsigter og protokoller i medicinsk kvalitet, udviklet til high performers i Danmark.">
-  <meta name="theme-color" content="#F3E8DB">
+  <title>Revigora — Kend dit helbred. Indefra.</title>
+  <meta name="description" content="45+ biomarkører analyseret på danske ISO-laboratorier. Tolket af læger. Fra 3.999 kr./år. Kom på ventelisten til den danske lancering af Revigora.">
+  <meta name="theme-color" content="#1A120D">
 
-  <meta property="og:title" content="Revigora — Mål det, der tæller, indeni">
+  <meta property="og:title" content="Revigora — Kend dit helbred. Indefra.">
   <meta property="og:description" content="Kom på ventelisten til den danske lancering af Revigora.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="da_DK">
@@ -16,201 +16,268 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=3">
+  <link rel="stylesheet" href="assets/css/styles.css?v=4">
 </head>
-<body>
+<body class="has-marketing-nav">
   <a class="skip-link" href="#main">Gå til indhold</a>
 
-  <!-- ============ HEADER ============ -->
-  <header class="site-header" id="top">
-    <div class="container site-header__inner">
-      <a class="brand" href="#top" aria-label="Revigora forside">
-        <img class="brand__logo" src="assets/img/revigora-logo.svg" alt="Revigora" width="66" height="24">
+  <!-- ============ NAV (transparent over hero → blurred linen once scrolled) ============ -->
+  <header class="marketing-nav" id="top" data-marketing-nav>
+    <div class="marketing-nav__bar">
+      <a class="marketing-nav__brand" href="#top" aria-label="Revigora forside">
+        <img class="marketing-nav__logo marketing-nav__logo--light" src="assets/img/revigora-logo-footer.svg" alt="Revigora" width="80" height="29">
+        <img class="marketing-nav__logo marketing-nav__logo--dark" src="assets/img/revigora-logo.svg" alt="Revigora" width="80" height="29">
       </a>
-      <nav class="site-nav" aria-label="Primær">
+      <nav class="marketing-nav__links" aria-label="Primær">
         <a href="#pakker">Pakker</a>
-        <a href="#proces">Proces</a>
-        <a href="#videnskab">Videnskab</a>
+        <a href="#proces">Sådan fungerer det</a>
         <a href="om-os.html">Om os</a>
         <a href="blog.html">Blog</a>
       </nav>
-      <div class="site-header__actions">
-        <a class="site-header__login" href="app/login.html">Log ind</a>
-        <button type="button" class="btn btn--primary btn--sm" data-open-waitlist data-intent="">
-          <span class="btn__full">Reservér adgang</span>
-          <span class="btn__compact">Reservér</span>
+      <div class="marketing-nav__actions">
+        <a class="marketing-nav__login" href="app/login.html">Log ind</a>
+        <button type="button" class="marketing-nav__cta press" data-open-waitlist data-intent="">
+          <span class="btn__full">Kom på ventelisten</span>
+          <span class="btn__compact">Venteliste</span>
+        </button>
+        <button type="button" class="marketing-nav__menu press" data-nav-menu-toggle aria-expanded="false" aria-controls="nav-drawer" aria-label="Åbn menu">
+          <svg viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1h16M1 6h16M1 11h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
       </div>
     </div>
   </header>
 
+  <div class="nav-drawer-backdrop" data-nav-drawer-backdrop hidden></div>
+  <nav class="nav-drawer" id="nav-drawer" data-nav-drawer aria-label="Mobilmenu" hidden>
+    <a class="nav-drawer__link" href="#pakker" data-nav-drawer-link>Pakker</a>
+    <a class="nav-drawer__link" href="#proces" data-nav-drawer-link>Sådan fungerer det</a>
+    <a class="nav-drawer__link" href="om-os.html" data-nav-drawer-link>Om os</a>
+    <a class="nav-drawer__link" href="blog.html" data-nav-drawer-link>Blog</a>
+    <a class="nav-drawer__link" href="app/login.html" data-nav-drawer-link>Log ind</a>
+  </nav>
+
   <main id="main">
 
     <!-- ============ 1 · HERO ============ -->
-    <section class="section section--hero" id="hero">
-      <div class="container hero__grid">
-        <div class="hero__copy">
-          <p class="eyebrow reveal">Forebyggende sundhed for Norden</p>
-          <h1 class="hero__title reveal">Stop med at gætte om dit helbred. Mål det, der tæller, <em>indeni</em>.</h1>
-          <p class="hero__sub reveal">Avanceret testning af blodbiomarkører, skræddersyede longevity-indsigter og protokoller i medicinsk kvalitet, udviklet til high performers i Danmark.</p>
-          <div class="hero__actions reveal">
-            <button type="button" class="btn btn--primary btn--lg" data-open-waitlist data-intent="">
-              Kom på ventelisten <span aria-hidden="true">→</span>
-            </button>
-            <p class="hero__note">Gratis at reservere · Ingen binding · Dansk lancering 2026</p>
-          </div>
+    <section class="hero" id="hero">
+      <picture class="hero__media">
+        <source media="(max-width: 767px)" srcset="assets/img/hero-mobile.jpeg">
+        <img src="assets/img/hero-desktop.jpeg" alt="Redaktionelt foto: aktiv livsstil" fetchpriority="high" decoding="async">
+      </picture>
+      <div class="hero__scrim" aria-hidden="true"></div>
+
+      <div class="hero__copy">
+        <p class="hero__eyebrow reveal"><span class="hero__dot" aria-hidden="true"></span>Venteliste åben · Dansk lancering 2026</p>
+        <h1 class="hero__title reveal">Kend dit helbred. Indefra.</h1>
+        <p class="hero__sub reveal">45+ biomarkører analyseret på danske ISO-laboratorier. Tolket af læger. Fra 3.999 kr./år.</p>
+        <div class="hero__ctas reveal">
+          <button type="button" class="hero__cta-primary press" data-open-waitlist data-intent="">
+            Kom på ventelisten <span aria-hidden="true">→</span>
+          </button>
+          <a href="#pakker" class="hero__cta-secondary press">Se pakker og priser<span class="hero__cta-secondary-arrow" aria-hidden="true"> ↓</span></a>
         </div>
+      </div>
 
-        <figure class="hero__media">
-          <picture>
-            <source media="(max-width: 767px)" srcset="assets/img/hero-mobile.jpeg">
-            <img src="assets/img/hero-desktop.jpeg" width="1280" height="720"
-                 alt="Redaktionelt foto: aktiv livsstil" fetchpriority="high" decoding="async">
-          </picture>
-
-          <div class="readout-card" aria-hidden="true">
-            <p class="readout-card__title">Dit dashboard</p>
-            <div class="readout" data-readout style="--pos: 46%">
-              <div class="readout__head">
-                <span class="readout__label">Biologisk alder</span>
-                <span class="readout__value">34,2 <span class="readout__unit">år</span></span>
-              </div>
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
-              <div class="readout__scale"><span>Lav</span><span>Optimal</span><span>Høj</span></div>
-            </div>
-            <div class="readout" data-readout style="--pos: 62%">
-              <div class="readout__head">
-                <span class="readout__label">ApoB</span>
-                <span class="readout__value">0,74 <span class="readout__unit">g/L</span></span>
-              </div>
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
-              <div class="readout__scale"><span>Lav</span><span>Optimal</span><span>Høj</span></div>
-            </div>
-            <div class="readout" data-readout style="--pos: 38%">
-              <div class="readout__head">
-                <span class="readout__label">hs-CRP</span>
-                <span class="readout__value">0,6 <span class="readout__unit">mg/L</span></span>
-              </div>
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
-              <div class="readout__scale"><span>Lav</span><span>Optimal</span><span>Høj</span></div>
-            </div>
-          </div>
-        </figure>
+      <div class="hero__proof reveal">
+        <div class="hero__stat">
+          <p class="hero__stat-num">45+</p>
+          <p class="hero__stat-label">biomarkører</p>
+        </div>
+        <span class="hero__divider" aria-hidden="true"></span>
+        <div class="hero__stat">
+          <p class="hero__stat-num">50+</p>
+          <p class="hero__stat-label">klinikker i DK</p>
+        </div>
+        <span class="hero__divider" aria-hidden="true"></span>
+        <div class="hero__stat">
+          <p class="hero__stat-num">3–5</p>
+          <p class="hero__stat-label">dage til svar</p>
+        </div>
       </div>
     </section>
 
-    <!-- ============ 2 · TESTING MADE EASY ============ -->
-    <section class="section section--vp" id="videnskab">
-      <div class="container">
-        <header class="section__head reveal">
-          <p class="eyebrow">Test gjort enkelt</p>
-          <h2 class="section__title">Fra prøve til protokol, <em>uden gætværk</em>.</h2>
-          <p class="section__intro">Ingen forvirrende faglige udtryk. En kort, klinisk vej fra blodprøve til konkrete handlinger.</p>
-        </header>
+    <!-- ============ 2 · HOW IT WORKS ============ -->
+    <section class="section section--how" id="proces">
+      <div class="container how-grid">
+        <div>
+          <header class="how__head reveal">
+            <p class="how__eyebrow">Sådan fungerer det</p>
+            <h2 class="how__title">Fra blodprøve til plan på under en uge.</h2>
+          </header>
 
-        <ul class="vp-grid">
-          <li class="vp-card reveal">
-            <p class="vp-card__figure">50<span class="vp-card__figure-sup">+</span></p>
-            <div class="readout readout--flat" data-readout style="--pos: 30%">
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
+          <ol class="steps">
+            <li class="step reveal">
+              <span class="step__rule step__rule--top" aria-hidden="true"></span>
+              <span class="step__num">1</span>
+              <div class="step__body">
+                <h3 class="step__title">Vælg din pakke</h3>
+                <p class="step__text">Bestil online på under et minut.</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__rule step__rule--top" aria-hidden="true"></span>
+              <span class="step__num">2</span>
+              <div class="step__body">
+                <h3 class="step__title">10 minutter på klinikken</h3>
+                <p class="step__text">Hurtig blodprøve i København, Aarhus eller Odense.</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__rule step__rule--top" aria-hidden="true"></span>
+              <span class="step__num">3</span>
+              <div class="step__body">
+                <h3 class="step__title">Analyse i klinisk kvalitet</h3>
+                <p class="step__text">ISO 15189-certificerede danske laboratorier. Svar på 3–5 hverdage.</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__rule step__rule--top" aria-hidden="true"></span>
+              <span class="step__rule step__rule--bottom" aria-hidden="true"></span>
+              <span class="step__num">4</span>
+              <div class="step__body">
+                <h3 class="step__title">Din personlige plan</h3>
+                <p class="step__text">Biologisk alder, målintervaller og konkrete næste skridt i dit dashboard.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="dash-card reveal" aria-hidden="true">
+          <div class="dash-card__head">
+            <p class="dash-card__label">Biologisk alder</p>
+            <span class="dash-card__delta">−3,8 år</span>
+          </div>
+          <div class="dash-card__age">
+            <span class="dash-card__age-num">34,2</span>
+            <span class="dash-card__age-note">år · faktisk 38</span>
+          </div>
+          <div class="dash-card__marker">
+            <div class="dash-card__marker-head">
+              <span class="dash-card__marker-name">ApoB</span>
+              <span class="dash-card__marker-value">0,74 g/L</span>
             </div>
-            <h3 class="vp-card__title">Lokale partnerklinikker</h3>
-            <p class="vp-card__body">Over 50 prøvesteder i København, Aarhus og Odense. Gå ind fra gaden, eller book online på under 60 sekunder.</p>
-          </li>
-          <li class="vp-card reveal">
-            <p class="vp-card__figure vp-card__figure--text">ISO&nbsp;15189</p>
-            <div class="readout readout--flat" data-readout style="--pos: 52%">
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
+            <div class="dash-card__bar">
+              <span class="dash-card__bar-zone"></span>
+              <span class="dash-card__bar-dot" style="--pos: 44%"></span>
             </div>
-            <h3 class="vp-card__title">Diagnostik i klinisk kvalitet</h3>
-            <p class="vp-card__body">Alle prøver analyseres på ISO 15189-certificerede danske diagnostiske laboratorier.</p>
-          </li>
-          <li class="vp-card reveal">
-            <p class="vp-card__figure">45<span class="vp-card__figure-sup">+</span></p>
-            <div class="readout readout--flat" data-readout style="--pos: 68%">
-              <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot"></span></div>
+          </div>
+          <div class="dash-card__marker">
+            <div class="dash-card__marker-head">
+              <span class="dash-card__marker-name">hs-CRP</span>
+              <span class="dash-card__marker-value">0,6 mg/L</span>
             </div>
-            <h3 class="vp-card__title">Handlingsorienteret digitalt dashboard</h3>
-            <p class="vp-card__body">Klare biomarkør-aflæsninger koblet med personlige protokoller for livsstil og kosttilskud, i stedet for tvetydige laboratorieintervaller.</p>
-          </li>
-        </ul>
+            <div class="dash-card__bar">
+              <span class="dash-card__bar-zone"></span>
+              <span class="dash-card__bar-dot" style="--pos: 36%"></span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ============ 3 · PACKAGES ============ -->
-    <section class="section section--packages" id="pakker">
+    <section class="pkg-section" id="pakker">
       <div class="container">
-        <header class="section__head reveal">
-          <p class="eyebrow">Vælg din pakke</p>
-          <h2 class="section__title">Tre veje til fuldt overblik over <em>din biologi</em>.</h2>
-          <p class="section__intro">Vælg den, der passer til dine mål. Alle paneler analyseres på certificerede danske laboratorier.</p>
+        <header class="pkg-head reveal">
+          <p class="pkg-eyebrow">Pakker</p>
+          <h2 class="pkg-title">Vælg dit udgangspunkt.</h2>
+          <p class="pkg-intro">Alle paneler analyseres på certificerede danske laboratorier og gennemgås af en læge.</p>
         </header>
 
-        <div class="package-grid">
-
-          <!-- Tier 1 -->
-          <article class="package package--t1 reveal">
-            <figure class="package__media">
-              <img src="assets/img/package-performance.jpeg" width="480" height="360"
-                   alt="" loading="lazy" decoding="async">
+        <!-- Mobile: one featured card + two tappable rows that open a detail sheet -->
+        <div class="pkg-mobile-stack">
+          <article class="pkg-featured reveal">
+            <figure class="pkg-featured__media">
+              <img src="assets/img/package-membership.webp" width="700" height="400" alt="" loading="lazy" decoding="async">
+              <span class="pkg-featured__ribbon">Mest populære</span>
             </figure>
-            <p class="package__badge">Basislinje</p>
-            <h3 class="package__name">Performance &amp; Fitness</h3>
-            <p class="package__target">Til atleter, træningsentusiaster og energifokus.</p>
-            <p class="package__markers"><span class="package__markers-num">28</span> biomarkører</p>
-            <p class="package__price"><span class="package__price-num">1.899</span> kr.</p>
-            <ul class="package__list">
-              <li>Testosteron &amp; hormoner</li>
-              <li>Stofskifte &amp; metabolisme</li>
-              <li>Lipidprofil</li>
-              <li>D-vitamin</li>
-              <li>Ferritin</li>
-            </ul>
-            <button type="button" class="btn btn--outline btn--block" data-open-waitlist data-intent="performance">Reservér Performance</button>
+            <div class="pkg-featured__body">
+              <h3 class="pkg-featured__name">Revigora-medlemskab</h3>
+              <p class="pkg-featured__desc">Fuldt panel hvert år, trendanalyser, lægefaglig gennemgang og en opdateret protokol.</p>
+            </div>
+            <div class="pkg-featured__footer">
+              <div class="pkg-featured__price-row">
+                <span class="pkg-featured__price-meta">45+ biomarkører · årligt</span>
+                <span class="pkg-price">3.999 kr./år</span>
+              </div>
+              <button type="button" class="pkg-cta pkg-cta--mint press" data-open-waitlist data-intent="membership" data-direct>Kom på ventelisten – Medlemskab</button>
+            </div>
           </article>
 
-          <!-- Tier 2 -->
-          <article class="package package--t2 reveal">
-            <p class="package__ribbon">Mest populære</p>
-            <figure class="package__media">
-              <img src="assets/img/package-longevity.jpeg" width="480" height="360"
-                   alt="" loading="lazy" decoding="async">
+          <button type="button" class="pkg-row press reveal" data-open-pkg-sheet="performance">
+            <span class="pkg-row__media" style="background-image:url(assets/img/package-performance.jpeg)"></span>
+            <span class="pkg-row__body">
+              <span class="pkg-row__name">Performance &amp; Fitness</span>
+              <span class="pkg-row__meta">28 biomarkører · 4.499 kr.</span>
+            </span>
+            <svg class="pkg-row__chevron" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <button type="button" class="pkg-row press reveal" data-open-pkg-sheet="longevity">
+            <span class="pkg-row__media" style="background-image:url(assets/img/package-longevity.jpeg)"></span>
+            <span class="pkg-row__body">
+              <span class="pkg-row__name">Longevity &amp; Healthspan</span>
+              <span class="pkg-row__meta">45+ biomarkører · 4.499 kr.</span>
+            </span>
+            <svg class="pkg-row__chevron" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Desktop: three uniform cards, Revigora-medlemskab centered -->
+        <div class="pkg-cards">
+          <article class="pkg-card reveal">
+            <figure class="pkg-card__media">
+              <img src="assets/img/package-performance.jpeg" width="700" height="400" alt="" loading="lazy" decoding="async">
             </figure>
-            <p class="package__badge package__badge--accent">Mest populære</p>
-            <h3 class="package__name">Longevity &amp; Healthspan</h3>
-            <p class="package__target">Til biohackers, executive health og anti-aging.</p>
-            <p class="package__markers"><span class="package__markers-num">45+</span> biomarkører</p>
-            <p class="package__price"><span class="package__price-num">1.899</span> kr.</p>
-            <ul class="package__list">
-              <li>Alt i Performance &amp; Fitness</li>
-              <li>ApoB &amp; hs-CRP</li>
-              <li>Fasteinsulin</li>
-              <li>Biologisk alder-score</li>
-              <li>Thyroidea (stofskiftehormoner)</li>
-            </ul>
-            <button type="button" class="btn btn--outline btn--block" data-open-waitlist data-intent="longevity">Reservér Longevity</button>
+            <div class="pkg-card__body">
+              <p class="pkg-card__eyebrow">Basislinje</p>
+              <h3 class="pkg-card__name">Performance &amp; Fitness</h3>
+              <p class="pkg-card__desc">Hormoner, stofskifte, lipider, D-vitamin og ferritin.</p>
+            </div>
+            <div class="pkg-card__footer">
+              <div class="pkg-card__price-row">
+                <span class="pkg-card__price-meta">28 biomarkører</span>
+                <span class="pkg-price">4.499 kr.</span>
+              </div>
+              <button type="button" class="pkg-cta pkg-cta--outline press" data-open-waitlist data-intent="performance" data-direct>Kom på ventelisten – Performance</button>
+            </div>
           </article>
 
-          <!-- Tier 3 -->
-          <article class="package package--t3 reveal">
-            <figure class="package__media">
-              <img src="assets/img/package-membership.webp" width="480" height="360"
-                   alt="" loading="lazy" decoding="async">
+          <article class="pkg-card pkg-card--featured reveal">
+            <figure class="pkg-card__media">
+              <img src="assets/img/package-membership.webp" width="700" height="400" alt="" loading="lazy" decoding="async">
+              <span class="pkg-card__ribbon">Mest populære</span>
             </figure>
-            <p class="package__badge">Løbende optimering</p>
-            <h3 class="package__name">Revigora-medlemskab</h3>
-            <p class="package__target">Til dig, der følger udviklingen over tid.</p>
-            <p class="package__markers"><span class="package__markers-num">45+</span> biomarkører · målt årligt</p>
-            <p class="package__price"><span class="package__price-num">1.699</span> kr.<span class="package__price-period"> / år</span></p>
-            <ul class="package__list">
-              <li>Årligt fuldt panel</li>
-              <li>Trendanalyser</li>
-              <li>Lægefaglig gennemgang</li>
-              <li>Opdateret tilskudsstak</li>
-            </ul>
-            <button type="button" class="btn btn--primary btn--block" data-open-waitlist data-intent="membership" data-direct>Reservér medlemskab</button>
+            <div class="pkg-card__body">
+              <h3 class="pkg-card__name">Revigora-medlemskab</h3>
+              <p class="pkg-card__desc">Fuldt panel hvert år, trendanalyser, lægefaglig gennemgang og en opdateret protokol.</p>
+            </div>
+            <div class="pkg-card__footer">
+              <div class="pkg-card__price-row">
+                <span class="pkg-card__price-meta">45+ biomarkører · årligt</span>
+                <span class="pkg-price">3.999 kr./år</span>
+              </div>
+              <button type="button" class="pkg-cta pkg-cta--mint press" data-open-waitlist data-intent="membership" data-direct>Kom på ventelisten – Medlemskab</button>
+            </div>
           </article>
 
+          <article class="pkg-card reveal">
+            <figure class="pkg-card__media">
+              <img src="assets/img/package-longevity.jpeg" width="700" height="400" alt="" loading="lazy" decoding="async">
+            </figure>
+            <div class="pkg-card__body">
+              <p class="pkg-card__eyebrow">Engangstest</p>
+              <h3 class="pkg-card__name">Longevity &amp; Healthspan</h3>
+              <p class="pkg-card__desc">ApoB, hs-CRP, fasteinsulin, stofskifte og din biologiske alder.</p>
+            </div>
+            <div class="pkg-card__footer">
+              <div class="pkg-card__price-row">
+                <span class="pkg-card__price-meta">45+ biomarkører</span>
+                <span class="pkg-price">4.499 kr.</span>
+              </div>
+              <button type="button" class="pkg-cta pkg-cta--outline press" data-open-waitlist data-intent="longevity" data-direct>Kom på ventelisten – Longevity</button>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -218,106 +285,93 @@
     <!-- ============ 4 · FOUNDER LETTER ============ -->
     <section class="section section--founder" id="founder-letter">
       <div class="container founder">
-        <p class="eyebrow reveal">Et brev fra stifteren</p>
+        <svg class="founder__mark reveal" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M0 28V16C0 7 5 1.5 14 0l1.5 3.5C10 5.5 7.5 9 7.5 13H14v15H0Zm21 0V16c0-9 5-14.5 14-16l1 3.5C30.5 5.5 28.5 9 28.5 13H35v15H21Z" fill="currentColor"/>
+        </svg>
         <blockquote class="founder__quote reveal">
-          <p>Jeg grundlagde Revigora, fordi det danske sundhedsvæsen er bygget til reaktiv behandling, ikke til proaktiv menneskelig ydeevne. Da jeg selv forsøgte at optimere min energi, mine hormoner og mine longevity-markører, fik jeg gentagne gange at vide, at almindelige blodprøver var unødvendige, medmindre jeg allerede var syg.</p>
-          <p>Vi byggede Revigora for at give ambitiøse mennesker fuldt ejerskab over deres egen biologi, med klinisk klarhed. Ved at måle det, der reelt driver healthspan, giver vi dig mulighed for at se ud, føle dig og præstere på dit absolutte bedste.</p>
+          <p>Jeg fik at vide, at blodprøver var unødvendige, medmindre jeg allerede var syg. Revigora er bygget til dem, der vil vide det før.</p>
         </blockquote>
         <p class="founder__sign reveal">— Stifter, Revigora</p>
       </div>
     </section>
 
-    <!-- ============ 5 · HOW IT WORKS ============ -->
-    <section class="section section--how" id="proces">
-      <div class="container">
-        <header class="section__head reveal">
-          <p class="eyebrow">Sådan fungerer det</p>
-          <h2 class="section__title">Fra bestilling til protokol i <em>fire trin</em>.</h2>
-        </header>
-
-        <ol class="steps">
-          <li class="step reveal">
-            <span class="step__num">1</span>
-            <span class="step__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L23 8H6"/><circle cx="10" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg>
-            </span>
-            <h3 class="step__title">Vælg panel</h3>
-            <p class="step__body">Vælg din målrettede diagnostiske pakke online på få sekunder.</p>
-          </li>
-          <li class="step reveal">
-            <span class="step__num">2</span>
-            <span class="step__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="10" height="17" rx="2"/><path d="M9 4V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1M10 12h4M10 16h4"/></svg>
-            </span>
-            <h3 class="step__title">10-minutters prøve</h3>
-            <p class="step__body">Besøg en partnerklinik i København, Aarhus eller Odense og få taget en hurtig blodprøve.</p>
-          </li>
-          <li class="step reveal">
-            <span class="step__num">3</span>
-            <span class="step__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M7 14l3 3 6-6"/></svg>
-            </span>
-            <h3 class="step__title">Avanceret laboratorieanalyse</h3>
-            <p class="step__body">Certificerede danske laboratorier analyserer dine markører på 3–5 hverdage.</p>
-          </li>
-          <li class="step reveal">
-            <span class="step__num">4</span>
-            <span class="step__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6M8 15l2.5 2.5L16 12"/></svg>
-            </span>
-            <h3 class="step__title">Optimér dit helbred</h3>
-            <p class="step__body">Få adgang til dit personlige dashboard med biologisk alder, målintervaller og konkrete sundhedsprotokoller.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- ============ 6 · SECONDARY CTA ============ -->
-    <section class="section section--cta2">
-      <div class="container cta2">
-        <h2 class="cta2__title reveal">Klar til at frigøre dit <em>biologiske potentiale</em>?</h2>
-        <p class="cta2__sub reveal">Bliv en del af de sundhedsbevidste, high performer danskere, der allerede venter på vores early access-hold.</p>
-        <button type="button" class="btn btn--ink btn--lg reveal" data-open-waitlist data-intent="membership" data-direct>
-          Kom på medlemskabs-ventelisten <span aria-hidden="true">→</span>
+    <!-- ============ 5 · FINAL CTA ============ -->
+    <section class="final-cta">
+      <div class="container final-cta__inner">
+        <div class="final-cta__copy">
+          <h2 class="final-cta__title reveal">Vær blandt de første i Danmark.</h2>
+          <p class="final-cta__sub reveal">Gratis at reservere. Ingen binding. Vi skriver, når lanceringen åbner.</p>
+        </div>
+        <button type="button" class="final-cta__btn press reveal" data-open-waitlist data-intent="">
+          Kom på ventelisten <span aria-hidden="true">→</span>
         </button>
       </div>
     </section>
 
   </main>
 
-  <!-- ============ 7 · FOOTER ============ -->
+  <!-- ============ 6 · FOOTER ============ -->
   <footer class="site-footer">
     <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a class="brand brand--footer" href="#top" aria-label="Revigora forside">
-          <img class="brand__logo" src="assets/img/revigora-logo-footer.svg" alt="Revigora" width="78" height="28">
-        </a>
-        <p class="site-footer__tagline">Proaktiv sundhedsintelligens for Norden.</p>
-        <p class="site-footer__copy">© 2026 Revigora ApS</p>
+
+      <div class="site-footer__columns">
+        <div class="site-footer__brand">
+          <a class="brand brand--footer" href="#top" aria-label="Revigora forside">
+            <img class="brand__logo" src="assets/img/revigora-logo-footer.svg" alt="Revigora" width="96" height="35">
+          </a>
+          <p class="site-footer__tagline site-footer__desktop-only">Forebyggende sundhed for Norden. Designet og udviklet i Aarhus.</p>
+        </div>
+
+        <div class="site-footer__links">
+          <nav class="site-footer__col" aria-label="Genveje">
+            <h2 class="site-footer__heading">Genveje</h2>
+            <a href="#pakker">Pakker</a>
+            <a href="#proces">Sådan fungerer det</a>
+            <a href="om-os.html">Om os</a>
+            <a href="blog.html">Blog</a>
+          </nav>
+
+          <nav class="site-footer__col" aria-label="Juridisk">
+            <h2 class="site-footer__heading">Juridisk</h2>
+            <a href="#">Privatliv</a>
+            <a href="#">Handelsbetingelser</a>
+            <a href="#">Cookies</a>
+            <a href="app/login.html" class="site-footer__mobile-only">Log ind</a>
+          </nav>
+
+          <nav class="site-footer__col site-footer__desktop-only" aria-label="Konto">
+            <h2 class="site-footer__heading">Konto</h2>
+            <a href="app/login.html">Log ind</a>
+            <button type="button" class="linklike" data-open-waitlist data-intent="">Kom på ventelisten</button>
+          </nav>
+        </div>
       </div>
 
-      <nav class="site-footer__col" aria-label="Genveje">
-        <h2 class="site-footer__heading">Genveje</h2>
-        <a href="#pakker">Pakker</a>
-        <a href="#proces">Proces</a>
-        <a href="#videnskab">Videnskab</a>
-        <button type="button" class="linklike" data-open-waitlist data-intent="">Venteliste</button>
-      </nav>
-
-      <nav class="site-footer__col" aria-label="Juridisk">
-        <h2 class="site-footer__heading">Juridisk</h2>
-        <a href="#">Privatlivspolitik</a>
-        <a href="#">Handelsbetingelser</a>
-        <a href="#">Cookies</a>
-      </nav>
-
-      <div class="site-footer__col">
-        <h2 class="site-footer__heading">Lokation</h2>
-        <p>Aarhus, Danmark</p>
-        <p class="site-footer__flag">🇩🇰 Designet og udviklet i Aarhus, Danmark</p>
-      </div>
+      <p class="site-footer__copy">© 2026 Revigora ApS · Aarhus, Danmark</p>
     </div>
   </footer>
+
+  <!-- ============ PACKAGE DETAIL SHEET (mobile) ============ -->
+  <div class="pkg-sheet-backdrop" data-close-pkg-sheet hidden></div>
+  <div class="pkg-sheet" id="pkg-sheet" role="dialog" aria-modal="true" aria-labelledby="pkg-sheet-name" hidden>
+    <div class="pkg-sheet__grabber" data-pkg-sheet-drag><span></span></div>
+    <figure class="pkg-sheet__media">
+      <img data-pkg-sheet-img src="" alt="">
+    </figure>
+    <div class="pkg-sheet__head">
+      <p class="pkg-sheet__eyebrow" data-pkg-sheet-eyebrow></p>
+      <h3 class="pkg-sheet__name" id="pkg-sheet-name" data-pkg-sheet-name></h3>
+      <p class="pkg-sheet__desc" data-pkg-sheet-desc></p>
+    </div>
+    <div class="pkg-sheet__includes" data-pkg-sheet-includes></div>
+    <div class="pkg-sheet__footer">
+      <div class="pkg-sheet__price-row">
+        <span class="pkg-sheet__price-meta" data-pkg-sheet-price-meta></span>
+        <span class="pkg-price" data-pkg-sheet-price></span>
+      </div>
+      <button type="button" class="pkg-cta pkg-cta--mint press" data-pkg-sheet-cta></button>
+    </div>
+  </div>
 
   <!-- ============ WAITLIST MODAL ============ -->
   <div class="modal" id="waitlist" data-modal hidden>
@@ -336,24 +390,24 @@
           <legend class="modal__title" id="wl-title">Hvilket panel passer til dine mål?</legend>
           <div class="intent-list">
             <label class="intent">
+              <input type="radio" name="intent" value="membership">
+              <span class="intent__body">
+                <span class="intent__name">Revigora-medlemskab</span>
+                <span class="intent__meta">45+ biomarkører · 3.999 kr. / år</span>
+              </span>
+            </label>
+            <label class="intent">
               <input type="radio" name="intent" value="performance">
               <span class="intent__body">
                 <span class="intent__name">Performance &amp; Fitness</span>
-                <span class="intent__meta">28 biomarkører · 1.899 kr.</span>
+                <span class="intent__meta">28 biomarkører · 4.499 kr.</span>
               </span>
             </label>
             <label class="intent">
               <input type="radio" name="intent" value="longevity">
               <span class="intent__body">
                 <span class="intent__name">Longevity &amp; Healthspan</span>
-                <span class="intent__meta">45+ biomarkører · 1.899 kr.</span>
-              </span>
-            </label>
-            <label class="intent">
-              <input type="radio" name="intent" value="membership">
-              <span class="intent__body">
-                <span class="intent__name">Årlig medlemskab</span>
-                <span class="intent__meta">45+ biomarkører · 1.699 kr. / år</span>
+                <span class="intent__meta">45+ biomarkører · 4.499 kr.</span>
               </span>
             </label>
           </div>
@@ -403,6 +457,6 @@
     </div>
   </div>
 
-  <script src="assets/js/main.js?v=3" defer></script>
+  <script src="assets/js/main.js?v=5" defer></script>
 </body>
 </html>

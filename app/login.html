@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="../assets/css/app.css?v=1">
+  <link rel="stylesheet" href="../assets/css/app.css?v=2">
 </head>
 <body class="no-js">
 
@@ -20,7 +20,7 @@
 
       <form class="auth-form" novalidate>
         <div>
-          <p class="eyebrow" style="margin:0 0 12px;">Log ind</p>
+          <p class="page-head__eyebrow" style="margin:0 0 12px;">Log ind</p>
           <h1>Velkommen tilbage.</h1>
           <p class="auth-form__intro">Se dine resultater, følg din udvikling og hold din protokol ved lige.</p>
         </div>
@@ -53,6 +53,13 @@
 
     <div class="auth-photo-side">
       <img src="../assets/img/package-longevity.jpeg" alt="" loading="lazy" decoding="async">
+      <div class="auth-readout" aria-hidden="true">
+        <p class="auth-readout__title">Din biologi, i overblik</p>
+        <div>
+          <div class="auth-readout__row"><span>Biologisk alder</span><span>34,2 år</span></div>
+          <div class="auth-readout__track" style="margin-top:8px;"><span class="auth-readout__zone"></span><span class="auth-readout__dot"></span></div>
+        </div>
+      </div>
     </div>
   </div>
 

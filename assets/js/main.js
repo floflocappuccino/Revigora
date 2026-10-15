@@ -70,6 +70,214 @@
   })();
 
   /* ===================================================================== *
+   * Marketing nav — transparent over the hero, blurred linen once scrolled
+   * ===================================================================== */
+  (function marketingNav() {
+    var nav = document.querySelector('[data-marketing-nav]');
+    var hero = document.getElementById('hero');
+    if (!nav || !hero) return;
+    function update() {
+      var threshold = Math.max(0, hero.offsetHeight - nav.offsetHeight);
+      nav.classList.toggle('is-scrolled', window.scrollY > threshold);
+    }
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  })();
+
+  /* ===================================================================== *
+   * Mobile nav drawer
+   * ===================================================================== */
+  (function navDrawer() {
+    var toggle = document.querySelector('[data-nav-menu-toggle]');
+    var drawer = document.getElementById('nav-drawer');
+    var backdrop = document.querySelector('[data-nav-drawer-backdrop]');
+    if (!toggle || !drawer) return;
+
+    function close() {
+      drawer.hidden = true;
+      if (backdrop) backdrop.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    function open() {
+      drawer.hidden = false;
+      if (backdrop) backdrop.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+    toggle.addEventListener('click', function () {
+      if (drawer.hidden) open(); else close();
+    });
+    if (backdrop) backdrop.addEventListener('click', close);
+    drawer.querySelectorAll('[data-nav-drawer-link]').forEach(function (a) {
+      a.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !drawer.hidden) close();
+    });
+    window.addEventListener('resize', function () {
+      if (window.matchMedia('(min-width: 768px)').matches) close();
+    });
+  })();
+
+  /* ===================================================================== *
+   * Sheet drag-to-dismiss — mobile bottom sheets only (waitlist + package).
+   * Press feedback / open-close is CSS; this adds the physical drag gesture:
+   * follow the finger 1:1, then on release either spring back or follow
+   * through and dismiss, based on distance dragged and release velocity.
+   * ===================================================================== */
+  function enableSheetDrag(sheetEl, backdropEl, close) {
+    if (!sheetEl) return;
+    var dragging = false, startY = 0, currentY = 0, startTime = 0;
+    var handle = sheetEl.querySelector('[data-pkg-sheet-drag], .modal__handle') || sheetEl;
+
+    function isMobile() { return !window.matchMedia('(min-width: 768px)').matches; }
+
+    function onPointerDown(e) {
+      if (reduceMotion || !isMobile()) return;
+      dragging = true;
+      startY = e.clientY;
+      currentY = 0;
+      startTime = Date.now();
+      sheetEl.style.transition = 'none';
+      handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+    }
+    function onPointerMove(e) {
+      if (!dragging) return;
+      currentY = Math.max(0, e.clientY - startY);
+      sheetEl.style.transform = 'translateY(' + currentY + 'px)';
+      if (backdropEl) backdropEl.style.opacity = String(Math.max(0, 1 - currentY / 280));
+    }
+    function onPointerUp() {
+      if (!dragging) return;
+      dragging = false;
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      var elapsed = Math.max(1, Date.now() - startTime);
+      var velocity = currentY / elapsed; // px / ms — flick-velocity projection
+      sheetEl.style.transition = '';
+      if (currentY > 120 || velocity > 0.5) {
+        sheetEl.style.transform = 'translateY(100%)';
+        setTimeout(close, 220);
+      } else {
+        sheetEl.style.transform = '';
+      }
+      if (backdropEl) backdropEl.style.opacity = '';
+      currentY = 0;
+    }
+    handle.addEventListener('pointerdown', onPointerDown);
+  }
+
+  /* ===================================================================== *
+   * Package detail sheet (mobile) — tapping a package row opens its detail
+   * as a bottom sheet; its own CTA hands off to the waitlist modal with the
+   * package pre-selected.
+   * ===================================================================== */
+  (function packageSheet() {
+    var sheet = document.getElementById('pkg-sheet');
+    var backdrop = document.querySelector('[data-close-pkg-sheet]');
+    if (!sheet || !backdrop) return;
+
+    var PACKAGES = {
+      performance: {
+        img: 'assets/img/package-performance.jpeg',
+        eyebrow: 'Basislinje · 28 biomarkører',
+        name: 'Performance & Fitness',
+        desc: 'Til atleter, træningsentusiaster og dig, der vil forstå din energi.',
+        includes: ['Testosteron & hormoner', 'Stofskifte & metabolisme', 'Lipidprofil', 'D-vitamin og ferritin'],
+        priceMeta: 'Engangstest',
+        price: '4.499 kr.',
+        ctaLabel: 'Kom på ventelisten – Performance'
+      },
+      longevity: {
+        img: 'assets/img/package-longevity.jpeg',
+        eyebrow: 'Engangstest · 45+ biomarkører',
+        name: 'Longevity & Healthspan',
+        desc: 'Til dig, der vil gå i dybden med biologisk alder og langsigtet sundhed.',
+        includes: ['ApoB & hs-CRP', 'Fasteinsulin', 'Biologisk alder-score', 'Thyroidea (stofskiftehormoner)'],
+        priceMeta: 'Engangstest',
+        price: '4.499 kr.',
+        ctaLabel: 'Kom på ventelisten – Longevity'
+      }
+    };
+
+    var imgEl = sheet.querySelector('[data-pkg-sheet-img]');
+    var eyebrowEl = sheet.querySelector('[data-pkg-sheet-eyebrow]');
+    var nameEl = sheet.querySelector('[data-pkg-sheet-name]');
+    var descEl = sheet.querySelector('[data-pkg-sheet-desc]');
+    var includesEl = sheet.querySelector('[data-pkg-sheet-includes]');
+    var priceMetaEl = sheet.querySelector('[data-pkg-sheet-price-meta]');
+    var priceEl = sheet.querySelector('[data-pkg-sheet-price]');
+    var ctaEl = sheet.querySelector('[data-pkg-sheet-cta]');
+    var lastFocused = null;
+    var currentKey = null;
+
+    var CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    function render(key) {
+      var pkg = PACKAGES[key];
+      if (!pkg) return;
+      currentKey = key;
+      imgEl.src = pkg.img;
+      imgEl.alt = pkg.name;
+      eyebrowEl.textContent = pkg.eyebrow;
+      nameEl.textContent = pkg.name;
+      descEl.textContent = pkg.desc;
+      includesEl.innerHTML = pkg.includes.map(function (item) {
+        return '<div class="pkg-sheet__item">' + CHECK_SVG + '<span>' + item + '</span></div>';
+      }).join('');
+      priceMetaEl.textContent = pkg.priceMeta;
+      priceEl.textContent = pkg.price;
+      ctaEl.textContent = pkg.ctaLabel;
+      ctaEl.setAttribute('data-intent', key);
+    }
+
+    function close() {
+      sheet.hidden = true;
+      backdrop.hidden = true;
+      root.style.overflow = '';
+      document.removeEventListener('keydown', onKeydown, true);
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    }
+    function open(key, trigger) {
+      lastFocused = trigger || document.activeElement;
+      render(key);
+      backdrop.hidden = false;
+      sheet.hidden = false;
+      root.style.overflow = 'hidden';
+      sheet.style.transform = '';
+      document.addEventListener('keydown', onKeydown, true);
+      track('package_sheet_open', { package: key });
+    }
+    function onKeydown(e) {
+      if (e.key === 'Escape') close();
+    }
+
+    document.querySelectorAll('[data-open-pkg-sheet]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        open(btn.getAttribute('data-open-pkg-sheet'), btn);
+      });
+    });
+    backdrop.addEventListener('click', close);
+
+    ctaEl.addEventListener('click', function () {
+      var key = currentKey;
+      close();
+      // hand off to the waitlist modal, pre-selected, after the sheet closes
+      setTimeout(function () {
+        var openWaitlist = document.querySelector('[data-open-waitlist][data-intent="' + key + '"]');
+        if (openWaitlist) { openWaitlist.click(); return; }
+        if (typeof window.__openWaitlistModal === 'function') {
+          window.__openWaitlistModal(key, ctaEl, true);
+        }
+      }, reduceMotion ? 0 : 160);
+    });
+
+    enableSheetDrag(sheet, backdrop, close);
+  })();
+
+  /* ===================================================================== *
    * Waitlist modal
    * ===================================================================== */
   var modal = document.getElementById('waitlist');
@@ -141,6 +349,19 @@
     lastFocused = trigger || document.activeElement;
     modal.hidden = false;
     root.style.overflow = 'hidden';
+    sheet.style.transform = '';
+
+    // Desktop: the dialog grows out of whichever button triggered it —
+    // compute the trigger's centre relative to the sheet's own box and
+    // feed it to the sheet as a transform-origin before the open animation
+    // (which restarts automatically whenever the element leaves [hidden]).
+    if (trigger && typeof trigger.getBoundingClientRect === 'function' && window.matchMedia('(min-width: 768px)').matches) {
+      var tr = trigger.getBoundingClientRect();
+      var sr = sheet.getBoundingClientRect();
+      sheet.style.transformOrigin = (tr.left + tr.width / 2 - sr.left) + 'px ' + (tr.top + tr.height / 2 - sr.top) + 'px';
+    } else {
+      sheet.style.transformOrigin = '';
+    }
 
     // reset flow
     errorEl.hidden = true;
@@ -150,6 +371,11 @@
     if (intent) {
       var pre = intentInputs.filter(function (i) { return i.value === intent; })[0];
       if (pre) { pre.checked = true; hasIntent = true; }
+    } else {
+      // Generic triggers (header/hero/footer) still show the panel picker,
+      // but membership is pre-selected as the default choice.
+      var defaultPre = intentInputs.filter(function (i) { return i.value === 'membership'; })[0];
+      if (defaultPre) defaultPre.checked = true;
     }
     twoStepMode = hasIntent && !!direct;
     if (prevBtn) prevBtn.hidden = twoStepMode;
@@ -166,6 +392,9 @@
     document.removeEventListener('keydown', onKeydown, true);
     if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
   }
+
+  window.__openWaitlistModal = openModal;
+  enableSheetDrag(sheet, modal.querySelector('.modal__backdrop'), closeModal);
 
   /* ---- triggers -------------------------------------------------------- */
   document.querySelectorAll('[data-open-waitlist]').forEach(function (btn) {

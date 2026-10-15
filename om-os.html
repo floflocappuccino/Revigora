@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=3">
+  <link rel="stylesheet" href="assets/css/styles.css?v=4">
 </head>
 <body>
   <a class="skip-link" href="#main">Gå til indhold</a>
@@ -147,34 +147,40 @@
   <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a class="brand brand--footer" href="index.html" aria-label="Revigora forside">
-          <img class="brand__logo" src="assets/img/revigora-logo-footer.svg" alt="Revigora" width="78" height="28">
-        </a>
-        <p class="site-footer__tagline">Proaktiv sundhedsintelligens for Norden.</p>
-        <p class="site-footer__copy">© 2026 Revigora ApS</p>
+      <div class="site-footer__columns">
+        <div class="site-footer__brand">
+          <a class="brand brand--footer" href="index.html" aria-label="Revigora forside">
+            <img class="brand__logo" src="assets/img/revigora-logo-footer.svg" alt="Revigora" width="96" height="35">
+          </a>
+          <p class="site-footer__tagline site-footer__desktop-only">Forebyggende sundhed for Norden. Designet og udviklet i Aarhus.</p>
+        </div>
+
+        <div class="site-footer__links">
+          <nav class="site-footer__col" aria-label="Genveje">
+            <h2 class="site-footer__heading">Genveje</h2>
+            <a href="index.html#pakker">Pakker</a>
+            <a href="index.html#proces">Sådan fungerer det</a>
+            <a href="om-os.html">Om os</a>
+            <a href="blog.html">Blog</a>
+          </nav>
+
+          <nav class="site-footer__col" aria-label="Juridisk">
+            <h2 class="site-footer__heading">Juridisk</h2>
+            <a href="#">Privatliv</a>
+            <a href="#">Handelsbetingelser</a>
+            <a href="#">Cookies</a>
+            <a href="app/login.html" class="site-footer__mobile-only">Log ind</a>
+          </nav>
+
+          <nav class="site-footer__col site-footer__desktop-only" aria-label="Konto">
+            <h2 class="site-footer__heading">Konto</h2>
+            <a href="app/login.html">Log ind</a>
+            <button type="button" class="linklike" data-open-waitlist data-intent="">Kom på ventelisten</button>
+          </nav>
+        </div>
       </div>
 
-      <nav class="site-footer__col" aria-label="Genveje">
-        <h2 class="site-footer__heading">Genveje</h2>
-        <a href="index.html#pakker">Pakker</a>
-        <a href="index.html#proces">Proces</a>
-        <a href="index.html#videnskab">Videnskab</a>
-        <button type="button" class="linklike" data-open-waitlist data-intent="">Venteliste</button>
-      </nav>
-
-      <nav class="site-footer__col" aria-label="Juridisk">
-        <h2 class="site-footer__heading">Juridisk</h2>
-        <a href="#">Privatlivspolitik</a>
-        <a href="#">Handelsbetingelser</a>
-        <a href="#">Cookies</a>
-      </nav>
-
-      <div class="site-footer__col">
-        <h2 class="site-footer__heading">Lokation</h2>
-        <p>Aarhus, Danmark</p>
-        <p class="site-footer__flag">Designet og udviklet i Aarhus, Danmark</p>
-      </div>
+      <p class="site-footer__copy">© 2026 Revigora ApS · Aarhus, Danmark</p>
     </div>
   </footer>
 
@@ -194,24 +200,24 @@
           <legend class="modal__title" id="wl-title">Hvilket panel passer til dine mål?</legend>
           <div class="intent-list">
             <label class="intent">
+              <input type="radio" name="intent" value="membership">
+              <span class="intent__body">
+                <span class="intent__name">Revigora-medlemskab</span>
+                <span class="intent__meta">45+ biomarkører · 3.999 kr. / år</span>
+              </span>
+            </label>
+            <label class="intent">
               <input type="radio" name="intent" value="performance">
               <span class="intent__body">
                 <span class="intent__name">Performance &amp; Fitness</span>
-                <span class="intent__meta">28 biomarkører · 1.899 kr.</span>
+                <span class="intent__meta">28 biomarkører · 4.499 kr.</span>
               </span>
             </label>
             <label class="intent">
               <input type="radio" name="intent" value="longevity">
               <span class="intent__body">
                 <span class="intent__name">Longevity &amp; Healthspan</span>
-                <span class="intent__meta">45+ biomarkører · 1.899 kr.</span>
-              </span>
-            </label>
-            <label class="intent">
-              <input type="radio" name="intent" value="membership">
-              <span class="intent__body">
-                <span class="intent__name">Årlig medlemskab</span>
-                <span class="intent__meta">45+ biomarkører · 1.699 kr. / år</span>
+                <span class="intent__meta">45+ biomarkører · 4.499 kr.</span>
               </span>
             </label>
           </div>
@@ -259,6 +265,6 @@
     </div>
   </div>
 
-  <script src="assets/js/main.js?v=3" defer></script>
+  <script src="assets/js/main.js?v=5" defer></script>
 </body>
 </html>

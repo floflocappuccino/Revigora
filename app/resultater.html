@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="../assets/css/app.css?v=1">
+  <link rel="stylesheet" href="../assets/css/app.css?v=2">
 </head>
 <body class="app-body no-js">
 
@@ -33,8 +33,14 @@
     <div class="container">
 
       <div class="page-head">
-        <span class="page-head__eyebrow">Longevity &amp; Healthspan · Prøve taget 12. september 2026</span>
-        <h1 class="page-head__title">Hej Mikkel, her er dit overblik.</h1>
+        <div class="page-head__copy">
+          <span class="page-head__eyebrow">Longevity &amp; Healthspan · Prøve taget 12. september 2026</span>
+          <h1 class="page-head__title">Hej Mikkel, her er dit overblik.</h1>
+        </div>
+        <a class="btn--outline-sm" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          Download PDF
+        </a>
       </div>
 
       <section class="summary-tiles" aria-label="Overblik">
@@ -51,7 +57,7 @@
         <div class="tile">
           <span class="tile__label">Kræver opmærksomhed</span>
           <div class="tile__value"><strong class="is-amber">3</strong><span>markører</span></div>
-          <p class="tile__note">2 tæt på grænsen, 1 uden for normalområdet.</p>
+          <p class="tile__note">2 lidt lave, 1 forhøjet.</p>
         </div>
       </section>
 
@@ -65,7 +71,7 @@
           </div>
           <div class="recap__point">
             <span class="recap__dot recap__dot--outside" aria-hidden="true"></span>
-            <p><strong>Fasteinsulin er uden for normalområdet</strong> — hovedfokus i din protokol.</p>
+            <p><strong>Fasteinsulin er forhøjet</strong> — hovedfokus i din protokol.</p>
           </div>
           <div class="recap__point">
             <span class="recap__dot recap__dot--borderline" aria-hidden="true"></span>
@@ -94,17 +100,18 @@
             <div class="marker-row">
               <div class="marker-row__top">
                 <span class="marker-row__name">Fasteinsulin<span class="marker-row__cat">Stofskifte</span></span>
-                <span class="status-pill status-pill--outside">Uden for</span>
+                <span class="status-pill status-pill--outside">Forhøjet</span>
               </div>
               <div class="marker-row__value">13,9<span>mIE/L</span></div>
               <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--outside" style="left:86%"></span></div>
               <p class="marker-row__note">Forhøjet fasteinsulin kan være et tidligt tegn på nedsat insulinfølsomhed. Din protokol har tre konkrete tiltag.</p>
+              <a class="marker-row__cta" href="#">Tal med en læge om dit resultat →</a>
             </div>
 
             <div class="marker-row">
               <div class="marker-row__top">
                 <span class="marker-row__name">D-vitamin<span class="marker-row__cat">Vitaminer &amp; mineraler</span></span>
-                <span class="status-pill status-pill--borderline">Grænse</span>
+                <span class="status-pill status-pill--borderline">Lidt lav</span>
               </div>
               <div class="marker-row__value">46<span>nmol/L</span></div>
               <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--borderline" style="left:22%"></span></div>
@@ -114,7 +121,7 @@
             <div class="marker-row">
               <div class="marker-row__top">
                 <span class="marker-row__name">Ferritin<span class="marker-row__cat">Vitaminer &amp; mineraler</span></span>
-                <span class="status-pill status-pill--borderline">Grænse</span>
+                <span class="status-pill status-pill--borderline">Lidt lav</span>
               </div>
               <div class="marker-row__value">38<span>µg/L</span></div>
               <div class="readout__track"><span class="readout__zone"></span><span class="readout__dot readout__dot--borderline" style="left:25%"></span></div>
@@ -176,13 +183,6 @@
             <a href="#">Book ny prøve →</a>
           </div>
         </aside>
-      </div>
-
-      <div class="footer-actions">
-        <a class="btn--outline-sm" href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 11l4 4 4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
-          Download PDF
-        </a>
       </div>
 
     </div>
