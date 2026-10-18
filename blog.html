@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=4">
+  <link rel="stylesheet" href="assets/css/styles.css?v=9">
 </head>
 <body>
   <a class="skip-link" href="#main">Gå til indhold</a>
@@ -199,39 +199,13 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
 
-      <p class="modal__progress" id="wl-step-status" aria-live="polite">Trin 1 af 3</p>
+      <div class="modal__progress-track" aria-hidden="true"><div class="modal__progress-fill" data-progress-fill></div></div>
+      <p class="modal__progress" id="wl-step-status" aria-live="polite">Trin 1 af 5</p>
 
       <form class="modal__form" novalidate>
+        <!-- Step 1 -->
         <fieldset class="wl-step" data-step="1">
-          <legend class="modal__title" id="wl-title">Hvilket panel passer til dine mål?</legend>
-          <div class="intent-list">
-            <label class="intent">
-              <input type="radio" name="intent" value="membership">
-              <span class="intent__body">
-                <span class="intent__name">Revigora-medlemskab</span>
-                <span class="intent__meta">45+ biomarkører · 3.999 kr. / år</span>
-              </span>
-            </label>
-            <label class="intent">
-              <input type="radio" name="intent" value="performance">
-              <span class="intent__body">
-                <span class="intent__name">Performance &amp; Fitness</span>
-                <span class="intent__meta">28 biomarkører · 4.499 kr.</span>
-              </span>
-            </label>
-            <label class="intent">
-              <input type="radio" name="intent" value="longevity">
-              <span class="intent__body">
-                <span class="intent__name">Longevity &amp; Healthspan</span>
-                <span class="intent__meta">45+ biomarkører · 4.499 kr.</span>
-              </span>
-            </label>
-          </div>
-          <button type="button" class="btn btn--primary btn--block" data-step-next disabled>Fortsæt</button>
-        </fieldset>
-
-        <fieldset class="wl-step" data-step="2" hidden>
-          <legend class="modal__title">Dine kontaktoplysninger</legend>
+          <legend class="modal__title" id="wl-title">Dine kontaktoplysninger</legend>
           <div class="field">
             <label for="wl-name">Fulde navn</label>
             <input id="wl-name" name="name" type="text" autocomplete="name" inputmode="text" required>
@@ -250,16 +224,55 @@
               <option value="Andet">Andet</option>
             </select>
           </div>
-          <p class="modal__error" data-form-error tabindex="-1" role="alert" hidden>Vi kunne ikke sende din tilmelding. Prøv igen.</p>
-          <div class="modal__nav">
-            <button type="button" class="btn btn--ghost" data-step-prev>Tilbage</button>
-            <button type="submit" class="btn btn--primary" data-submit>Sikr min plads</button>
+          <div class="field field--checkbox">
+            <label class="checkbox">
+              <input type="checkbox" id="wl-consent" name="marketing_consent">
+              <span>Ja tak, send mig nyheder og tilbud fra Revigora frem mod lanceringen. Læs vores <a href="/privatlivspolitik" target="_blank" rel="noopener">privatlivspolitik</a>.</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn--primary btn--block" data-submit>Sikr min plads</button>
+        </fieldset>
+
+        <!-- Step 2 -->
+        <fieldset class="wl-step" data-step="2" hidden>
+          <legend class="modal__title">Hvad er du mest interesseret i?</legend>
+          <div class="wl-chip-grid" data-interest-options></div>
+          <div class="field" data-other-field hidden>
+            <label for="wl-other">Uddyb gerne</label>
+            <input id="wl-other" name="interest_other" type="text" maxlength="140">
+          </div>
+          <button type="button" class="btn btn--primary btn--block" data-step-continue="3">Fortsæt</button>
+          <div class="wl-step-links">
+            <button type="button" class="linklike" data-step-back>Tilbage</button>
+            <button type="button" class="linklike" data-step-skip>Spring over</button>
           </div>
         </fieldset>
 
-        <fieldset class="wl-step wl-step--done" data-step="3" hidden>
+        <!-- Step 3 -->
+        <fieldset class="wl-step" data-step="3" hidden>
+          <legend class="modal__title">Hvor gammel er du?</legend>
+          <div class="wl-option-list" role="radiogroup" data-age-options></div>
+          <div class="wl-step-links">
+            <button type="button" class="linklike" data-step-back>Tilbage</button>
+            <button type="button" class="linklike" data-step-skip>Spring over</button>
+          </div>
+        </fieldset>
+
+        <!-- Step 4 -->
+        <fieldset class="wl-step" data-step="4" hidden>
+          <legend class="modal__title">Hvor ofte træner du?</legend>
+          <div class="wl-option-list" role="radiogroup" data-frequency-options></div>
+          <p class="modal__error" data-form-error tabindex="-1" role="alert" hidden>Vi kunne ikke sende din tilmelding. Prøv igen.</p>
+          <div class="wl-step-links">
+            <button type="button" class="linklike" data-step-back>Tilbage</button>
+            <button type="button" class="linklike" data-step-skip>Spring over</button>
+          </div>
+        </fieldset>
+
+        <!-- Step 5 -->
+        <fieldset class="wl-step wl-step--done" data-step="5" hidden>
           <legend class="modal__title">Du er på ventelisten til early access.</legend>
-          <p class="modal__lead" data-confirm-text>Vi sender dig en mail, så snart den danske lancering åbner. Du er blandt de første, der får adgang.</p>
+          <p class="modal__lead" data-confirm-text>Vi har sendt en bekræftelsesmail. Du er blandt de første, der får adgang, når vi lancerer i Danmark.</p>
           <div class="modal__share">
             <button type="button" class="btn btn--primary btn--block" data-share hidden>Del via SMS / WhatsApp</button>
             <button type="button" class="btn btn--outline btn--block" data-copy>Kopiér link</button>
@@ -271,6 +284,6 @@
     </div>
   </div>
 
-  <script src="assets/js/main.js?v=5" defer></script>
+  <script src="assets/js/main.js?v=8" defer></script>
 </body>
 </html>

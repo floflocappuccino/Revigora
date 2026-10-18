@@ -180,18 +180,8 @@
     if (!sheet || !backdrop) return;
 
     var PACKAGES = {
-      performance: {
-        img: 'assets/img/package-performance.jpeg',
-        eyebrow: 'Basislinje · 28 biomarkører',
-        name: 'Performance & Fitness',
-        desc: 'Til atleter, træningsentusiaster og dig, der vil forstå din energi.',
-        includes: ['Testosteron & hormoner', 'Stofskifte & metabolisme', 'Lipidprofil', 'D-vitamin og ferritin'],
-        priceMeta: 'Engangstest',
-        price: '4.499 kr.',
-        ctaLabel: 'Kom på ventelisten – Performance'
-      },
       longevity: {
-        img: 'assets/img/package-longevity.jpeg',
+        img: 'assets/img/package-box-enkelt-tjek.png',
         eyebrow: 'Engangstest · 45+ biomarkører',
         name: 'Longevity & Healthspan',
         desc: 'Til dig, der vil gå i dybden med biologisk alder og langsigtet sundhed.',
@@ -278,54 +268,169 @@
   })();
 
   /* ===================================================================== *
-   * Waitlist modal
+   * Waitlist modal — fixed 5-step flow:
+   *   1. Contact info (+ optional marketing consent)       -> kept in memory
+   *   2. Interests (multi-select)
+   *   3. Age range (single-select, auto-advance)
+   *   4. Training frequency (single-select, auto-advance)  -> POST stage=completed
+   *   5. Confirmation
+   * Exactly one Formspree submission per modal session: it fires once they
+   * finish step 4 (answered or skipped), or early — tagged stage=abandoned —
+   * if they close the modal anywhere in steps 2-4. Closing on step 1 (before
+   * it's been submitted) sends nothing.
+   * `intent` (which package) is set only by which button opened the modal —
+   * there is no in-modal picker any more. Generic triggers (header/hero/
+   * footer, data-intent="") default to "membership".
    * ===================================================================== */
   var modal = document.getElementById('waitlist');
   if (!modal) return;
+
+  var TOTAL_STEPS = 5;
+
+  // Edit the Danish labels or machine-readable values here — steps 2-4 are
+  // rendered from this config, nowhere else.
+  var PROFILE_CONFIG = {
+    interests: [
+      { value: 'training', label: 'Jeg vil have mere ud af min træning' },
+      { value: 'work', label: 'Jeg vil præstere bedre på arbejdet' },
+      { value: 'baseline', label: 'Jeg vil have en baseline at sammenligne med fremover' },
+      { value: 'energy', label: 'Jeg vil have mere energi i hverdagen' },
+      { value: 'aging', label: 'Jeg vil sikre, at jeg ældes godt' },
+      { value: 'other', label: 'Andet' }
+    ],
+    ageRanges: [
+      { value: 'under-20', label: 'Under 20' },
+      { value: '20-29', label: '20–29' },
+      { value: '30-39', label: '30–39' },
+      { value: '40-49', label: '40–49' },
+      { value: '50-59', label: '50–59' },
+      { value: '60-plus', label: '60+' }
+    ],
+    trainingFrequencies: [
+      { value: 'rarely', label: 'Sjældent eller aldrig' },
+      { value: '1-2', label: '1–2 gange om ugen' },
+      { value: '3-4', label: '3–4 gange om ugen' },
+      { value: '5-plus', label: '5 gange om ugen eller mere' }
+    ]
+  };
 
   var sheet = modal.querySelector('.modal__sheet');
   var form = modal.querySelector('.modal__form');
   var steps = Array.prototype.slice.call(modal.querySelectorAll('.wl-step'));
   var progress = modal.querySelector('.modal__progress');
-  var nextBtn = modal.querySelector('[data-step-next]');
-  var prevBtn = modal.querySelector('[data-step-prev]');
-  var submitBtn = modal.querySelector('[data-submit]');
+  var progressFill = modal.querySelector('[data-progress-fill]');
   var errorEl = modal.querySelector('[data-form-error]');
+  var consentInput = modal.querySelector('#wl-consent');
   var confirmText = modal.querySelector('[data-confirm-text]');
   var shareBtn = modal.querySelector('[data-share]');
   var copyBtn = modal.querySelector('[data-copy]');
   var copiedEl = modal.querySelector('[data-copied]');
-  var intentInputs = Array.prototype.slice.call(modal.querySelectorAll('input[name="intent"]'));
+
+  var interestListEl = modal.querySelector('[data-interest-options]');
+  var otherFieldEl = modal.querySelector('[data-other-field]');
+  var otherInputEl = modal.querySelector('#wl-other');
+  var ageListEl = modal.querySelector('[data-age-options]');
+  var freqListEl = modal.querySelector('[data-frequency-options]');
 
   var lastFocused = null;
   var currentStep = 1;
-  var submitDefaultLabel = submitBtn ? submitBtn.textContent : 'Send';
 
-  // Set when a "direct" trigger (membership) opens the modal: the panel picker
-  // is skipped entirely and the flow is framed as 2 steps with no back button.
-  // Other pre-selected panels also skip the picker but keep the 3-step framing.
-  var twoStepMode = false;
+  var currentIntent = '';
+  var submissionSent = false; // set once the single Formspree POST has gone out
+  var refHash = '';
+  var refParam = (function () {
+    try { return new URLSearchParams(window.location.search).get('ref') || ''; }
+    catch (e) { return ''; }
+  })();
+
+  var contact = { name: '', email: '', city: '', consent: false, consentTimestamp: '' };
+  var state = { interests: [], interestOther: '', ageRange: '', trainingFrequency: '' };
+
+  /* ---- render steps 2-4 option lists once, from PROFILE_CONFIG -------- */
+  function renderOptionList(container, options, kind) {
+    if (!container) return;
+    options.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'wl-option press';
+      btn.textContent = opt.label;
+      btn.dataset.value = opt.value;
+      if (kind === 'multi') btn.setAttribute('aria-pressed', 'false');
+      else { btn.setAttribute('role', 'radio'); btn.setAttribute('aria-checked', 'false'); }
+      container.appendChild(btn);
+    });
+  }
+  renderOptionList(interestListEl, PROFILE_CONFIG.interests, 'multi');
+  renderOptionList(ageListEl, PROFILE_CONFIG.ageRanges, 'single');
+  renderOptionList(freqListEl, PROFILE_CONFIG.trainingFrequencies, 'single');
+
+  function resetOptionButtons(container, attr) {
+    if (!container) return;
+    Array.prototype.forEach.call(container.querySelectorAll('.wl-option'), function (b) {
+      b.setAttribute(attr, 'false');
+    });
+  }
+
+  // The one payload shape, used whether the flow completes or is abandoned.
+  function buildPayload(stage) {
+    return {
+      intent: currentIntent,
+      name: contact.name,
+      email: contact.email,
+      city: contact.city,
+      locale: 'da',
+      source: 'landing-waitlist',
+      marketing_consent: contact.consent,
+      consent_timestamp: contact.consentTimestamp,
+      ref: refParam,
+      interests: state.interests.join(','),
+      interest_other: state.interestOther,
+      age_range: state.ageRange,
+      training_frequency: state.trainingFrequency,
+      stage: stage // 'completed' | 'abandoned'
+    };
+  }
+
+  /* ---- ref hash: first 8 hex chars of SHA-256(email), never the email -- */
+  function computeRefHash(email) {
+    refHash = '';
+    if (!email || !window.crypto || !window.crypto.subtle) return;
+    try {
+      var bytes = new TextEncoder().encode(email.trim().toLowerCase());
+      window.crypto.subtle.digest('SHA-256', bytes).then(function (buf) {
+        var hex = Array.prototype.map.call(new Uint8Array(buf), function (b) {
+          return b.toString(16).padStart(2, '0');
+        }).join('');
+        refHash = hex.slice(0, 8);
+      }).catch(function () { refHash = ''; });
+    } catch (e) { refHash = ''; }
+  }
+
+  function buildShareUrl() {
+    try {
+      var url = new URL(window.location.href);
+      if (refHash) url.searchParams.set('ref', refHash);
+      return url.toString();
+    } catch (e) {
+      return window.location.href;
+    }
+  }
 
   function showStep(n) {
     currentStep = n;
     steps.forEach(function (fs) {
       fs.hidden = Number(fs.dataset.step) !== n;
     });
-    if (progress) {
-      progress.textContent = twoStepMode
-        ? 'Trin ' + (n - 1) + ' af 2'
-        : 'Trin ' + n + ' af 3';
-    }
+    if (progress) progress.textContent = 'Trin ' + n + ' af ' + TOTAL_STEPS;
+    if (progressFill) progressFill.style.width = Math.round((n / TOTAL_STEPS) * 100) + '%';
     var active = steps[n - 1];
-    var legend = active.querySelector('.modal__title');
-    if (legend) {
-      if (!legend.id) legend.id = 'wl-title-' + n;
-      sheet.setAttribute('aria-labelledby', legend.id);
+    var heading = active.querySelector('.modal__title');
+    if (heading) {
+      if (!heading.id) heading.id = 'wl-title-' + n;
+      sheet.setAttribute('aria-labelledby', heading.id);
+      if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
+      heading.focus();
     }
-    var focusTarget = Array.prototype.slice
-      .call(active.querySelectorAll('input, select, button'))
-      .filter(function (el) { return !el.disabled && el.offsetParent !== null; })[0];
-    if (focusTarget) focusTarget.focus();
   }
 
   function getFocusable() {
@@ -345,7 +450,7 @@
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   }
 
-  function openModal(intent, trigger, direct) {
+  function openModal(intent, trigger) {
     lastFocused = trigger || document.activeElement;
     modal.hidden = false;
     root.style.overflow = 'hidden';
@@ -366,27 +471,31 @@
     // reset flow
     errorEl.hidden = true;
     if (copiedEl) copiedEl.hidden = true;
-    intentInputs.forEach(function (i) { i.checked = false; });
-    var hasIntent = false;
-    if (intent) {
-      var pre = intentInputs.filter(function (i) { return i.value === intent; })[0];
-      if (pre) { pre.checked = true; hasIntent = true; }
-    } else {
-      // Generic triggers (header/hero/footer) still show the panel picker,
-      // but membership is pre-selected as the default choice.
-      var defaultPre = intentInputs.filter(function (i) { return i.value === 'membership'; })[0];
-      if (defaultPre) defaultPre.checked = true;
-    }
-    twoStepMode = hasIntent && !!direct;
-    if (prevBtn) prevBtn.hidden = twoStepMode;
-    if (nextBtn) nextBtn.disabled = !modal.querySelector('input[name="intent"]:checked');
-    showStep(hasIntent ? 2 : 1);
+    currentIntent = intent || 'membership';
+    submissionSent = false;
+    refHash = '';
+    contact = { name: '', email: '', city: '', consent: false, consentTimestamp: '' };
+    state = { interests: [], interestOther: '', ageRange: '', trainingFrequency: '' };
+    form.reset();
+    if (otherFieldEl) otherFieldEl.hidden = true;
+    resetOptionButtons(interestListEl, 'aria-pressed');
+    resetOptionButtons(ageListEl, 'aria-checked');
+    resetOptionButtons(freqListEl, 'aria-checked');
+
+    showStep(1);
 
     document.addEventListener('keydown', onKeydown, true);
-    track(window.matchMedia('(min-width: 768px)').matches ? 'desktop_modal_open' : 'mobile_modal_open', { intent: intent || null });
+    track(window.matchMedia('(min-width: 768px)').matches ? 'desktop_modal_open' : 'mobile_modal_open', { intent: currentIntent });
   }
 
   function closeModal() {
+    // Step 1 must be explicitly submitted before anything is captured. Once
+    // past it (steps 2-4), bailing out still sends the one submission —
+    // whatever contact + profile data has been collected so far — tagged
+    // "abandoned" instead of "completed".
+    if (!submissionSent && currentStep >= 2 && currentStep <= 4) {
+      sendAbandoned();
+    }
     modal.hidden = true;
     root.style.overflow = '';
     document.removeEventListener('keydown', onKeydown, true);
@@ -399,44 +508,125 @@
   /* ---- triggers -------------------------------------------------------- */
   document.querySelectorAll('[data-open-waitlist]').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      openModal(btn.getAttribute('data-intent') || '', btn, btn.hasAttribute('data-direct'));
+      openModal(btn.getAttribute('data-intent') || '', btn);
     });
   });
   modal.querySelectorAll('[data-close-waitlist]').forEach(function (btn) {
     btn.addEventListener('click', closeModal);
   });
 
-  /* ---- step 1 -------------------------------------------------------- */
-  intentInputs.forEach(function (input) {
-    input.addEventListener('change', function () {
-      if (nextBtn) nextBtn.disabled = false;
+  /* ---- step navigation: Tilbage / Spring over / Fortsæt (step 2 only) - */
+  modal.querySelectorAll('[data-step-back]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var n = Number(btn.closest('.wl-step').dataset.step);
+      showStep(Math.max(1, n - 1));
     });
   });
-  if (nextBtn) nextBtn.addEventListener('click', function () { showStep(2); });
-  if (prevBtn) prevBtn.addEventListener('click', function () { showStep(1); });
-
-  /* ---- step 2 · submit --------------------------------------------- */
-  function collect() {
-    var data = new FormData(form);
-    return {
-      intent: data.get('intent') || '',
-      name: (data.get('name') || '').toString().trim(),
-      email: (data.get('email') || '').toString().trim(),
-      city: data.get('city') || '',
-      locale: 'da',
-      source: 'landing-waitlist'
-    };
+  modal.querySelectorAll('[data-step-skip]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var n = Number(btn.closest('.wl-step').dataset.step);
+      if (n === 4) { finishProfile(); return; }
+      showStep(n + 1);
+    });
+  });
+  var continueBtn = modal.querySelector('[data-step-continue]');
+  if (continueBtn) {
+    continueBtn.addEventListener('click', function () {
+      showStep(Number(continueBtn.getAttribute('data-step-continue')));
+    });
   }
 
-  function validStep2() {
-    var fields = steps[1].querySelectorAll('input, select');
+  /* ---- step 2: interests (multi-select + "Andet" reveal) -------------- */
+  if (interestListEl) {
+    interestListEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.wl-option');
+      if (!btn) return;
+      var value = btn.dataset.value;
+      var wasPressed = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', String(!wasPressed));
+      if (wasPressed) {
+        state.interests = state.interests.filter(function (v) { return v !== value; });
+      } else {
+        state.interests.push(value);
+      }
+      if (value === 'other' && otherFieldEl) {
+        otherFieldEl.hidden = wasPressed;
+        if (wasPressed && otherInputEl) { otherInputEl.value = ''; state.interestOther = ''; }
+        else if (otherInputEl) { otherInputEl.focus(); }
+      }
+    });
+  }
+  if (otherInputEl) {
+    otherInputEl.addEventListener('input', function () {
+      state.interestOther = otherInputEl.value.trim();
+    });
+  }
+
+  /* ---- steps 3 & 4: single-select, auto-advance ------------------------ */
+  function wireSingleSelect(container, onPick) {
+    if (!container) return;
+    container.addEventListener('click', function (e) {
+      var btn = e.target.closest('.wl-option');
+      if (!btn) return;
+      Array.prototype.forEach.call(container.querySelectorAll('.wl-option'), function (b) {
+        b.setAttribute('aria-checked', String(b === btn));
+      });
+      onPick(btn.dataset.value);
+    });
+  }
+  wireSingleSelect(ageListEl, function (value) { state.ageRange = value; showStep(4); });
+  wireSingleSelect(freqListEl, function (value) { state.trainingFrequency = value; finishProfile(); });
+
+  // step 4's own "Spring over" ends the flow the same way an answer does.
+  function finishProfile() { submitFinal(); }
+
+  function setStep4Busy(busy) {
+    Array.prototype.forEach.call(steps[3].querySelectorAll('button'), function (b) { b.disabled = busy; });
+  }
+
+  // The only point the flow can actually fail: nothing has been saved yet,
+  // so (unlike before) this blocks advancing to the confirmation screen —
+  // showing "you're on the list" when nothing was sent would be worse.
+  async function submitFinal() {
+    if (submissionSent) { showStep(5); setupConfirmation(); return; }
+    errorEl.hidden = true;
+    setStep4Busy(true);
+    try {
+      await postToFormspree(buildPayload('completed'));
+      submissionSent = true;
+      track('waitlist_completed', { intent: currentIntent });
+      showStep(5);
+      setupConfirmation();
+    } catch (err) {
+      errorEl.hidden = false;
+      errorEl.focus && errorEl.focus();
+    } finally {
+      setStep4Busy(false);
+    }
+  }
+
+  // Fire-and-forget: the visitor is already leaving, there's no UI left to
+  // retry into, so just log a failure rather than block the close.
+  function sendAbandoned() {
+    if (submissionSent) return;
+    submissionSent = true;
+    postToFormspree(buildPayload('abandoned'))
+      .then(function () { track('waitlist_abandoned', { intent: currentIntent }); })
+      .catch(function (err) {
+        if (window.console && console.error) console.error('[waitlist] abandoned submission failed', err);
+      });
+  }
+
+  /* ---- step 1 · contact info + consent (kept in memory, not sent yet) -- */
+  function validStep1() {
+    var fields = steps[0].querySelectorAll('input, select');
     for (var i = 0; i < fields.length; i++) {
       if (!fields[i].checkValidity()) { fields[i].reportValidity(); return false; }
     }
     return true;
   }
 
-  async function submitWaitlist(payload) {
+  async function postToFormspree(payload) {
     var res = await fetch(FORM_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -448,38 +638,37 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    if (currentStep !== 2 || !validStep2()) return;
+    if (currentStep !== 1) return;
+    if (!validStep1()) return;
 
-    var payload = collect();
-    errorEl.hidden = true;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sender…';
+    var data = new FormData(form);
+    contact.name = (data.get('name') || '').toString().trim();
+    contact.email = (data.get('email') || '').toString().trim();
+    contact.city = data.get('city') || '';
+    contact.consent = !!(consentInput && consentInput.checked);
+    contact.consentTimestamp = new Date().toISOString();
+    computeRefHash(contact.email);
 
-    submitWaitlist(payload)
-      .then(function () {
-        track('waitlist_completed', { intent: payload.intent, city: payload.city });
-        if (confirmText && payload.email) {
-          confirmText.textContent = 'Vi sender en mail til ' + payload.email +
-            ', så snart den danske lancering åbner. Du er blandt de første, der får adgang.';
-        }
-        setupShare();
-        showStep(3);
-      })
-      .catch(function () {
-        errorEl.hidden = false;
-        errorEl.focus && errorEl.focus();
-      })
-      .finally(function () {
-        submitBtn.disabled = false;
-        submitBtn.textContent = submitDefaultLabel;
-      });
+    showStep(2);
   });
 
-  /* ---- step 3 · share --------------------------------------------- */
+  /* ---- step 5 · confirmation + share ------------------------------------ */
   var SHARE_TEXT = 'Jeg er kommet på ventelisten til Revigora — proaktiv sundhedstestning for Norden.';
 
+  function setupConfirmation() {
+    if (confirmText) {
+      var text = 'Vi har sendt en bekræftelsesmail til ' + contact.email +
+        '. Du er blandt de første, der får adgang, når vi lancerer i Danmark.';
+      if (consentInput && consentInput.checked) {
+        text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
+      }
+      confirmText.textContent = text;
+    }
+    setupShare();
+  }
+
   function setupShare() {
-    var url = window.location.href;
+    var url = buildShareUrl();
     if (navigator.share) {
       shareBtn.hidden = false;
       shareBtn.onclick = function () {
@@ -492,7 +681,7 @@
 
   if (copyBtn) {
     copyBtn.addEventListener('click', function () {
-      var url = window.location.href;
+      var url = buildShareUrl();
       var done = function () {
         if (!copiedEl) return;
         copiedEl.hidden = false;

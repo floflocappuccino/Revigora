@@ -651,7 +651,7 @@ button { font-family: inherit; color: inherit; }
   .pkg-title { font-size: 3.25rem; }
 
   .pkg-mobile-stack { display: none; }
-  .pkg-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
+  .pkg-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 480px)); gap: 24px; align-items: stretch; justify-content: center; }
 
   .pkg-card {
     display: flex;
@@ -996,6 +996,20 @@ button { font-family: inherit; color: inherit; }
 .modal__close:hover { background: rgba(20, 20, 20, .06); }
 .modal__close svg { width: 20px; height: 20px; }
 
+.modal__progress-track {
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-hairline);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.modal__progress-fill {
+  height: 100%;
+  width: 20%;
+  background: var(--color-mint-leaf);
+  border-radius: var(--radius-pill);
+  transition: width .3s cubic-bezier(.22, 1, .36, 1);
+}
 .modal__progress {
   font-family: var(--font-mono);
   font-size: .6875rem;
@@ -1007,22 +1021,27 @@ button { font-family: inherit; color: inherit; }
 .modal__form { display: grid; }
 .wl-step { border: 0; padding: 0; margin: 0; display: grid; gap: 14px; }
 .modal__title { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1.2; }
+.modal__title:focus-visible { outline: none; }
 .modal__lead { font-size: .9375rem; line-height: 1.6; color: var(--color-body-dim); }
 
-.intent-list { display: grid; gap: 10px; }
-.intent {
+.intent-list, .wl-option-list, .wl-chip-grid { display: grid; gap: 10px; }
+.intent, .wl-option {
   position: relative;
   display: block;
+  width: 100%;
   min-height: var(--min-touch-target);
   padding: 14px 16px;
   border: 1px solid var(--color-hairline);
   border-radius: 12px;
   background: var(--color-white-surface);
   cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
   transition: border-color .16s ease, box-shadow .16s ease;
 }
 .intent input { position: absolute; opacity: 0; pointer-events: none; }
-.intent__name { display: block; font-weight: 600; font-size: .9375rem; }
+.intent__name, .wl-option__name { display: block; font-weight: 600; font-size: .9375rem; }
 .intent__meta {
   display: block;
   margin-top: 3px;
@@ -1030,14 +1049,41 @@ button { font-family: inherit; color: inherit; }
   font-size: .75rem;
   color: var(--color-silver);
 }
-.intent:hover { border-color: var(--color-silver); }
-.intent:has(input:checked) {
+.intent:hover, .wl-option:hover { border-color: var(--color-silver); }
+.intent:has(input:checked),
+.wl-option[aria-pressed="true"],
+.wl-option[aria-checked="true"] {
   border-color: var(--color-mint-leaf);
   box-shadow: inset 0 0 0 1px var(--color-mint-leaf);
 }
-.intent:focus-within { outline: 2px solid var(--color-text-primary); outline-offset: 2px; }
+.intent:focus-within, .wl-option:focus-visible { outline: 2px solid var(--color-text-primary); outline-offset: 2px; }
+.wl-option:disabled { opacity: .5; cursor: not-allowed; }
+
+.wl-step-links { display: flex; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.wl-step-links .linklike { min-height: var(--min-touch-target); display: inline-flex; align-items: center; font-size: .875rem; font-weight: 600; color: var(--color-body-dim); }
+.wl-step-links .linklike:hover { color: var(--color-text-primary); }
+.wl-step-links .linklike:disabled { opacity: .5; cursor: not-allowed; }
+.wl-step-links .linklike:disabled:hover { color: var(--color-body-dim); }
 
 .field { display: grid; gap: 6px; }
+.field--checkbox { display: block; }
+.checkbox {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: start;
+  gap: 10px;
+  cursor: pointer;
+  padding-block: 2px;
+}
+.checkbox input {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  accent-color: var(--color-mint-leaf);
+}
+.checkbox span { min-width: 0; font-size: .8125rem; line-height: 1.5; color: var(--color-body-dim); }
+.checkbox a { color: var(--color-text-primary); text-decoration: underline; }
 .field label { font-size: .8125rem; font-weight: 500; color: var(--color-body-dim); }
 .field input, .field select {
   width: 100%;
