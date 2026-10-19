@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dit helbred — Revigora</title>
+  <meta name="robots" content="noindex">
+  <script src="../assets/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=3">
+</head>
+<body class="app-body no-js" data-page="helbred">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+  <a class="skip-link" href="#main">Spring til indhold</a>
+
+  <header data-app-header></header>
+
+  <main class="app-main" id="main">
+    <div class="app-container app-stack">
+
+      <div class="page-header">
+        <div class="page-header__copy">
+          <p class="eyebrow" data-test-eyebrow>Longevity &amp; Healthspan · Prøve taget 12. september 2026</p>
+          <h1 class="page-header__title">Dit helbred</h1>
+        </div>
+        <div class="page-header__actions">
+          <button type="button" class="pill-btn" data-print>
+            <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 6V2.5h7V6M4.5 11.5h-2v-5h11v5h-2M4.5 9.5h7v4h-7z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            Print
+          </button>
+          <div class="dropdown">
+            <button type="button" class="test-switcher" aria-haspopup="menu" aria-expanded="false" aria-controls="test-menu" data-test-switcher>
+              <span data-test-switcher-label>Test 4 af 4 · 12. sep 2026</span>
+              <span class="test-switcher__chev">
+                <svg class="icon-12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </button>
+            <div class="test-menu" id="test-menu" role="menu" aria-label="Vælg test" hidden data-test-menu></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview">
+        <div class="overview__main">
+
+          <div class="status-summary" role="group" aria-label="Filtrer efter status" data-stats></div>
+
+          <section class="biomarkers" aria-labelledby="biomarkers-count">
+            <div class="list-header">
+              <h2 class="list-header__count" id="biomarkers-count" aria-live="polite" data-list-count>45 biomarkører</h2>
+              <div class="list-header__tools">
+                <div class="list-search" data-search>
+                  <button type="button" class="icon-btn list-search__open" aria-label="Søg i biomarkører" aria-expanded="false" aria-controls="marker-search" data-search-open>
+                    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </button>
+                  <div class="list-search__field">
+                    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 10.6L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <label class="visually-hidden" for="marker-search">Søg efter biomarkør</label>
+                    <input type="search" id="marker-search" placeholder="Søg biomarkør" autocomplete="off" data-search-input>
+                    <button type="button" class="list-search__clear" aria-label="Luk søgning" data-search-clear>
+                      <svg class="icon-10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 2L8 8M8 2L2 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="filter-chips" role="group" aria-label="Filtre" data-chips></div>
+              </div>
+            </div>
+            <div class="biomarkers__list" data-marker-list></div>
+          </section>
+
+        </div>
+
+        <aside class="overview__side" aria-label="Opsummering og plan">
+
+          <article class="notes-card" data-notes-card>
+            <div class="notes-card__body">
+              <div class="notes-card__head">
+                <h2 class="notes-card__title">Lægeteamets noter</h2>
+                <svg class="notes-card__icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a5 5 0 0 0 10 0V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 14v2.5a4.5 4.5 0 0 0 9 0V14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              </div>
+              <div class="notes-card__excerpt">
+                <p class="notes-card__date" data-notes-date></p>
+                <p class="notes-card__text" data-notes-excerpt></p>
+              </div>
+              <p class="notes-card__by" data-notes-by></p>
+            </div>
+            <a class="notes-card__footer" href="noter.html">
+              Læs hele opsummeringen
+              <svg class="icon-12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <section class="plan-block" aria-labelledby="plan-title" data-plan>
+            <h2 class="plan-block__title" id="plan-title">Din handlingsplan</h2>
+            <div class="plan-card">
+              <a class="plan-row" href="handlingsplan.html">
+                <span class="plan-row__icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h14a7 7 0 0 1-14 0Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 7c0-1.5 1-2 1-3.5M11.5 7c0-1.5 1-2 1-3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </span>
+                <span class="plan-row__copy">
+                  <span class="plan-row__title">Kost</span>
+                  <span class="plan-row__sub" data-plan-diet></span>
+                </span>
+                <svg class="icon-12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <a class="plan-row" href="handlingsplan.html#tilskud">
+                <span class="plan-row__icon">
+                  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="7" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 7v6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                </span>
+                <span class="plan-row__copy">
+                  <span class="plan-row__title">Tilskud</span>
+                  <span class="plan-row__sub" data-plan-supplements></span>
+                </span>
+                <svg class="icon-12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </section>
+
+          <div class="bioage-card" data-bio-age></div>
+
+          <div class="next-test-card" data-next-test>
+            <p class="eyebrow" data-next-eyebrow></p>
+            <p class="next-test-card__text" data-next-text></p>
+            <a class="next-test-card__link" href="bestil.html">Book ny prøve →</a>
+          </div>
+
+        </aside>
+      </div>
+
+    </div>
+  </main>
+
+  <nav data-app-tabbar></nav>
+
+  <script src="../assets/js/app-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
