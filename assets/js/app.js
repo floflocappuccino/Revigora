@@ -81,11 +81,11 @@
   // Bands for the range preview / chart, top → bottom. Equal height on screen.
   function bandsOf(m) {
     if (m.bands) return m.bands;
-    var lo = m.range.low, hi = m.range.high, d = m.decimals;
+    var lo = m.range.low, hi = m.range.high, d = m.rangeDecimals !== undefined ? m.rangeDecimals : m.decimals;
     if (lo !== undefined && hi !== undefined) {
       var span = hi - lo;
       return [
-        { status: 'over', label: 'Over', text: '> ' + fmt(hi, d), min: hi, max: hi + span * 0.5 },
+        { status: 'over', label: 'Over', text: '> ' + fmt(hi, d), min: hi, max: hi + span * 0.75 },
         { status: 'in', label: 'I området', text: fmt(lo, d) + '–' + fmt(hi, d), min: lo, max: hi },
         { status: 'under', label: 'Under', text: '< ' + fmt(lo, d), min: Math.max(0, lo - span * 0.5), max: lo }
       ];
@@ -116,6 +116,7 @@
     // Category icons (20×20), from the Paper category rails
     heart: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16.5S3 12.4 3 7.6A3.6 3.6 0 0 1 10 6a3.6 3.6 0 0 1 7 1.6c0 4.8-7 8.9-7 8.9Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.5 10H8l1-2 2 4 1-2h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     bolt: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M11 2.5L4.5 11h5l-1 6.5L15.5 9h-5l.5-6.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+    steth: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a5 5 0 0 0 10 0V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 14v2.5a4.5 4.5 0 0 0 9 0V14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
     pill: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="3.5" y="7.5" width="13" height="5" rx="2.5" transform="rotate(-45 10 10)" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 8L12 12" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'
   };
 
@@ -376,7 +377,7 @@
 
   function initHelbred() {
     var state = {
-      test: LATEST,
+      test: (function () { var t = parseInt(param('test'), 10); return t >= 0 && t < D.tests.length ? t : LATEST; })(),
       filter: FILTERS.indexOf(param('filter')) > -1 ? param('filter') : null,
       query: ''
     };
@@ -480,23 +481,6 @@
 
     /* ---- Marker list ------------------------------------------------------ */
 
-    function markerRow(m) {
-      var t = state.test, st = statusAt(m, t), out = st !== 'in';
-      return '<a class="biomarker-row" href="markoer.html?id=' + m.id + '" data-marker="' + m.id + '">' +
-        '<span class="biomarker-row__bar is-' + (out ? 'out' : 'in') + '"></span>' +
-        '<span class="biomarker-row__body">' +
-          '<span class="biomarker-row__name">' + esc(m.name) + '</span>' +
-          '<span class="biomarker-row__meta">' +
-            '<span class="biomarker-row__status is-' + (out ? 'out' : 'in') + '">' + STATUS_LABEL[st] + '</span>' +
-            '<span class="biomarker-row__sep" aria-hidden="true">·</span>' +
-            '<span class="biomarker-row__value">' + fmt(valueAt(m, t), m.decimals) + '</span>' +
-            (m.unit ? '<span class="biomarker-row__unit">' + esc(m.unit) + '</span>' : '') +
-          '</span>' +
-        '</span>' +
-        '<span class="biomarker-row__spark">' + sparkline(m, t) + '</span>' +
-      '</a>';
-    }
-
     function railMeta(all, matching, t) {
       if (matching.length === all.length) {
         var out = all.filter(function (m) { return isOut(m, t); }).length;
@@ -554,7 +538,7 @@
             '<a class="cat-rail__link" href="kategori.html?id=' + cat.id + '">Se kategori' + ICON.chevronRight + '</a>' +
           '</div>' +
           '<div class="cat-group__rows">' +
-            rows.map(markerRow).join('') +
+            rows.map(function (m) { return markerRowHTML(m, state.test); }).join('') +
             (more.length ? '<a class="biomarker-more" href="kategori.html?id=' + cat.id + '">+ ' + more.length + ' flere · ' + more.map(function (m) { return esc(m.name); }).join(', ') + '</a>' : '') +
           '</div>' +
         '</section>';
@@ -739,6 +723,791 @@
     render();
   }
 
+  /* ======================= Shared page building blocks ===================== */
+
+  var MORE_ICONS = {
+    chevronLeft: '<svg class="icon-14" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 3L4.5 6L7.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    chevronRight14: '<svg class="icon-14" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6L4.5 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    info: '<svg class="icon-18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4.5M10 6.5v.01" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    download: '<svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M8 10L5 7M8 10l3-3M3 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    doc: '<svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 6h5M5.5 9h5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+    book: '<svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3h4.5A1.5 1.5 0 0 1 9 4.5V13a1.5 1.5 0 0 0-1.5-1.5H3V3ZM13 3H10.5A1.5 1.5 0 0 0 9 4.5V13a1.5 1.5 0 0 1 1.5-1.5H13V3Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+    check: '<svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5L6.5 12L13 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    ban: '<svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.2 11.8L11.8 4.2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+    calendar: '<svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h14M7 2v4M13 2v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+    pin: '<svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
+    logout: '<svg class="icon-15" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5H3.5v11H6M10.5 5l3 3-3 3M13.5 8H6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    bowl: '<svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h14a7 7 0 0 1-14 0Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7c0-1.5 1-2 1-3.5M11.5 7c0-1.5 1-2 1-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+    capsule: '<svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="7" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
+  };
+
+  var WEEKDAYS = ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'];
+  function weekday(iso) { var d = parseDate(iso); return WEEKDAYS[new Date(Date.UTC(d.y, d.m, d.d)).getUTCDay()]; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function kr(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' kr.'; }
+  function shortName(m) { return m.shortName || m.name; }
+
+  function markerRowHTML(m, t, opts) {
+    var st = statusAt(m, t), out = st !== 'in';
+    var tag = opts && opts.improvingTag && isImproving(m, t)
+      ? '<span class="tag tag--teal tag--sm">' + ICON.arrowUp + 'Forbedres</span>' : '';
+    return '<a class="biomarker-row" href="markoer.html?id=' + m.id + '" data-marker="' + m.id + '">' +
+      '<span class="biomarker-row__bar is-' + (out ? 'out' : 'in') + '"></span>' +
+      '<span class="biomarker-row__body">' +
+        '<span class="biomarker-row__name">' + esc(m.name) + '</span>' +
+        '<span class="biomarker-row__meta">' +
+          '<span class="biomarker-row__status is-' + (out ? 'out' : 'in') + '">' + STATUS_LABEL[st] + '</span>' +
+          '<span class="biomarker-row__sep" aria-hidden="true">·</span>' +
+          '<span class="biomarker-row__value">' + fmt(valueAt(m, t), m.decimals) + '</span>' +
+          (m.unit ? '<span class="biomarker-row__unit">' + esc(m.unit) + '</span>' : '') +
+          tag +
+        '</span>' +
+      '</span>' +
+      '<span class="biomarker-row__spark">' + sparkline(m, t) + '</span>' +
+    '</a>';
+  }
+
+  // "2 – 10", "< 0,90", "> 60"
+  function rangeText(m, sep) {
+    var d = m.rangeDecimals !== undefined ? m.rangeDecimals : m.decimals;
+    var lo = m.range.low, hi = m.range.high;
+    if (lo !== undefined && hi !== undefined) return fmt(lo, d) + (sep || ' – ') + fmt(hi, d);
+    return hi !== undefined ? '< ' + fmt(hi, d) : '> ' + fmt(lo, d);
+  }
+
+  function breadcrumbHTML(items) {
+    return '<nav class="breadcrumb" aria-label="Brødkrumme"><ol>' + items.map(function (it, i) {
+      var last = i === items.length - 1;
+      return '<li>' + (last
+        ? '<span aria-current="page">' + esc(it.label) + '</span>'
+        : '<a href="' + it.href + '">' + esc(it.label) + '</a><span class="breadcrumb__sep" aria-hidden="true">/</span>') + '</li>';
+    }).join('') + '</ol></nav>';
+  }
+  function pagerHTML(prev, label, next) {
+    return '<div class="pager">' +
+      '<a class="pager__btn" href="' + prev.href + '" aria-label="' + esc(prev.label) + '">' + MORE_ICONS.chevronLeft + '</a>' +
+      '<span class="pager__label">' + esc(label) + '</span>' +
+      '<a class="pager__btn" href="' + next.href + '" aria-label="' + esc(next.label) + '">' + MORE_ICONS.chevronRight14 + '</a>' +
+    '</div>';
+  }
+  function targetTag(id) {
+    var m = markersById[id];
+    return '<a class="tag tag--amber" href="markoer.html?id=' + id + '"><span class="dot dot--6 dot--out"></span>' + esc(shortName(m)) + '</a>';
+  }
+  function demoAlert(msg) { window.alert(msg + '\n\n(Dette er en statisk mockup.)'); }
+
+  // Scroll spy: marks the link whose section top has passed `offset`.
+  function scrollSpy(links, offsetFn, onChange) {
+    var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+    var ticking = false, current = null;
+    function update() {
+      ticking = false;
+      var off = offsetFn(), idx = 0;
+      sections.forEach(function (sec, i) { if (sec && sec.getBoundingClientRect().top - off <= 0) idx = i; });
+      // At the very bottom, the last section wins
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) idx = sections.length - 1;
+      if (idx === current) return;
+      current = idx;
+      links.forEach(function (a, i) {
+        a.classList.toggle('is-active', i === idx);
+        if (i === idx) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+      if (onChange) onChange(idx);
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
+  // Modal side panel: scrim, Esc, focus trap, focus return.
+  function initPanel(panel, scrim, openers) {
+    var lastFocus = null;
+    function focusables() {
+      return Array.prototype.filter.call(panel.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+        function (el) { return el.offsetParent !== null; });
+    }
+    function open(e) {
+      if (e) e.preventDefault();
+      lastFocus = document.activeElement;
+      panel.hidden = false; scrim.hidden = false;
+      requestAnimationFrame(function () { panel.classList.add('is-open'); scrim.classList.add('is-open'); });
+      document.documentElement.classList.add('has-panel-open');
+      var f = focusables(); if (f.length) f[0].focus();
+    }
+    function close() {
+      panel.classList.remove('is-open'); scrim.classList.remove('is-open');
+      document.documentElement.classList.remove('has-panel-open');
+      setTimeout(function () { panel.hidden = true; scrim.hidden = true; }, reduceMotion.matches ? 0 : 320);
+      if (lastFocus) lastFocus.focus();
+    }
+    openers.forEach(function (b) { b.addEventListener('click', open); });
+    scrim.addEventListener('click', close);
+    panel.querySelectorAll('[data-panel-close]').forEach(function (b) { b.addEventListener('click', close); });
+    panel.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.stopPropagation(); close(); return; }
+      if (e.key !== 'Tab') return;
+      var f = focusables(); if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+
+  /* ============================ Page: Kategori ============================ */
+
+  function initKategori() {
+    var cat = categoriesById[param('id')] || categoriesById.vitaminer;
+    var t = LATEST, ci = D.categories.indexOf(cat), n = D.categories.length;
+    var all = markersIn(cat.id, t);
+    var outM = all.filter(function (m) { return isOut(m, t); });
+    var impN = all.filter(function (m) { return isImproving(m, t); }).length;
+    var inN = all.length - outM.length;
+    var content = D.categoryContent[cat.id] || {};
+    var note = D.notes.categories[cat.id] || { paragraphs: [] };
+    var noteDate = D.notes.overall.date;
+    var filter = null;
+    document.title = cat.name + ' — Revigora';
+
+    var prev = D.categories[(ci - 1 + n) % n], next = D.categories[(ci + 1) % n];
+    document.querySelector('[data-crumbs]').innerHTML =
+      breadcrumbHTML([{ href: 'helbred.html', label: 'Dit helbred' }, { label: cat.name }]) +
+      pagerHTML({ href: 'kategori.html?id=' + prev.id, label: 'Forrige kategori: ' + prev.name },
+        (ci + 1) + ' af ' + n + ' kategorier',
+        { href: 'kategori.html?id=' + next.id, label: 'Næste kategori: ' + next.name });
+
+    // Hero
+    var orbitDots = [[150, 260], [352, 230], [120, 150], [330, 320]];
+    var hero = document.querySelector('[data-cat-hero]');
+    hero.querySelector('[data-hero-eyebrow]').textContent = 'Kategori · ' + all.length + ' biomarkører';
+    hero.querySelector('[data-hero-title]').textContent = cat.name;
+    hero.querySelector('[data-hero-tagline]').textContent = content.tagline || '';
+    hero.querySelector('[data-hero-orbit]').innerHTML =
+      '<circle cx="230" cy="190" r="70" class="orbit-ring" style="--o:.35"/>' +
+      '<circle cx="230" cy="190" r="120" class="orbit-ring" style="--o:.22"/>' +
+      '<circle cx="230" cy="190" r="170" class="orbit-ring" style="--o:.14"/>' +
+      '<circle cx="230" cy="190" r="220" class="orbit-ring" style="--o:.08"/>' +
+      '<circle cx="300" cy="140" r="6" class="orbit-dot is-in"/>' +
+      outM.slice(0, orbitDots.length).map(function (m, i) {
+        return '<circle cx="' + orbitDots[i][0] + '" cy="' + orbitDots[i][1] + '" r="4" class="orbit-dot is-out"/>';
+      }).join('');
+
+    // Distribution histogram (bar height ∝ count, largest = full height)
+    var bars = [
+      { n: inN, label: 'I området', kind: 'in' },
+      { n: outM.length, label: 'Uden for området', kind: 'out' },
+      { n: impN, label: 'Forbedres', kind: 'improving' }
+    ];
+    var maxN = Math.max.apply(null, bars.map(function (b) { return b.n; })) || 1;
+    document.querySelector('[data-dist-eyebrow]').textContent = 'Fordeling · ' + all.length + ' biomarkører';
+    document.querySelector('[data-histogram]').innerHTML = bars.map(function (b) {
+      return '<div class="histogram__col histogram__col--' + b.kind + '">' +
+        '<span class="histogram__num">' + b.n + '</span>' +
+        '<span class="histogram__label">' + b.label + '</span>' +
+        '<span class="histogram__bar" style="--h:' + (b.n / maxN) + '"></span>' +
+      '</div>';
+    }).join('');
+
+    // Notes card + panel
+    document.querySelector('[data-cat-notes-eyebrow]').textContent = cat.name;
+    document.querySelector('[data-cat-notes-date]').textContent = noteDate;
+    document.querySelector('[data-cat-notes-excerpt]').textContent = note.excerpt || note.paragraphs.join(' ');
+    var panel = document.querySelector('[data-notes-panel]');
+    panel.querySelector('[data-panel-eyebrow]').textContent = cat.name;
+    panel.querySelector('[data-panel-meta]').textContent = noteDate + ' · Revigoras lægeteam';
+    panel.querySelector('[data-panel-body]').innerHTML =
+      note.paragraphs.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+      (outM.length ? '<div class="link-cards">' + outM.map(function (m) {
+        return '<a class="link-card" href="markoer.html?id=' + m.id + '">' +
+          '<span class="link-card__name"><span class="dot dot--out"></span>' + esc(shortName(m)) + '</span>' +
+          '<span class="link-card__value">' + fmt(valueAt(m, t), m.decimals) + ' ' + esc(m.unit) + ' →</span></a>';
+      }).join('') + '</div>' : '');
+    initPanel(panel, document.querySelector('[data-panel-scrim]'), Array.prototype.slice.call(document.querySelectorAll('[data-open-notes]')));
+
+    // Marker list
+    var listEl = document.querySelector('[data-cat-rows]');
+    var chipsEl = document.querySelector('[data-cat-chips]');
+    function renderList() {
+      var rows = all.filter(function (m) {
+        return !filter || (filter === 'out' ? isOut(m, t) : !isOut(m, t));
+      });
+      // Out-of-range first, then the rest in data order (as in Paper 06)
+      rows.sort(function (a, b) { return (isOut(b, t) ? 1 : 0) - (isOut(a, t) ? 1 : 0); });
+      document.querySelector('[data-cat-count]').textContent = rows.length + ' biomarkører';
+      var chips = [
+        { key: null, label: 'Alle · ' + all.length },
+        { key: 'out', label: 'Uden for området · ' + outM.length, dot: 'out' },
+        { key: 'in', label: 'I området · ' + inN, dot: 'in' }
+      ];
+      chipsEl.innerHTML = chips.map(function (c) {
+        var on = c.key === filter;
+        return '<button type="button" class="filter-chip' + (on ? ' is-active' : '') + '" aria-pressed="' + on + '" data-filter="' + (c.key || '') + '">' +
+          (c.dot ? '<span class="dot dot--' + c.dot + '"></span>' : '') + '<span>' + c.label + '</span></button>';
+      }).join('');
+      listEl.innerHTML = rows.map(function (m) { return markerRowHTML(m, t, { improvingTag: true }); }).join('');
+    }
+    chipsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-filter]'); if (!b) return;
+      var f = b.getAttribute('data-filter') || null;
+      filter = filter === f ? null : f;
+      renderList();
+    });
+    renderList();
+
+    // About
+    var sections = [{ id: 'hvorfor', title: 'Hvorfor det betyder noget' }].concat(content.sections || []);
+    document.querySelector('[data-about-title]').textContent = content.aboutTitle || 'Om ' + cat.name.toLowerCase();
+    document.querySelector('[data-about-nav]').innerHTML = sections.map(function (s) {
+      return '<a href="#' + s.id + '">' + esc(s.title) + '</a>';
+    }).join('');
+    document.querySelector('[data-about-body]').innerHTML =
+      '<div id="hvorfor" class="about-body__block">' +
+        '<p class="about-body__lead">' + esc(content.intro || '') + '</p>' +
+        (content.why || []).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+      '</div>' +
+      (content.sections || []).map(function (s) {
+        return '<div id="' + s.id + '" class="about-body__block"><h3>' + esc(s.title) + '</h3>' +
+          s.paragraphs.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>';
+      }).join('') +
+      '<div class="disclaimer">' + MORE_ICONS.info + '<p>Indholdet er generel information og erstatter ikke en konsultation med din egen læge.</p></div>';
+
+    // Sticky category bar (screen 13)
+    var bar = document.querySelector('[data-cat-sticky]');
+    bar.querySelector('[data-sticky-title]').textContent = cat.name;
+    bar.querySelector('[data-sticky-split]').innerHTML =
+      '<span class="cat-sticky__n is-in">' + inN + '</span>' +
+      '<span class="cat-sticky__bars"><span class="is-in" style="--w:' + inN + '"></span>' + (outM.length ? '<span class="is-out" style="--w:' + outM.length + '"></span>' : '') + '</span>' +
+      (outM.length ? '<span class="cat-sticky__n is-out">' + outM.length + '</span>' : '') +
+      '<span class="visually-hidden">' + inN + ' i området, ' + outM.length + ' uden for området</span>';
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        var show = !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0;
+        bar.classList.toggle('is-visible', show);
+        bar.setAttribute('aria-hidden', String(!show));
+        bar.querySelectorAll('a').forEach(function (a) { a.tabIndex = show ? 0 : -1; });
+      }, { rootMargin: '-' + 72 + 'px 0px 0px 0px' }).observe(hero);
+    }
+    var headerOffset = function () { return 72 + 100; };
+    scrollSpy(Array.prototype.slice.call(bar.querySelectorAll('.cat-sticky__links a')), headerOffset);
+    scrollSpy(Array.prototype.slice.call(document.querySelectorAll('[data-about-nav] a')), headerOffset);
+  }
+
+  /* ============================= Page: Markør ============================= */
+
+  var BAND_LABEL = { over: 'Over området', border: 'Grænse', in: 'I området', under: 'Under området' };
+
+  function markerChart(m) {
+    var bands = bandsOf(m), BH = 100, H = BH * bands.length, W = 966, n = D.tests.length;
+    var xs = [], step = n > 1 ? 630 / (n - 1) : 0;
+    for (var i = 0; i < n; i++) xs.push(100 + i * step);
+    var xNext = 880;
+    function yOf(v) {
+      var idx = bands.length - 1;
+      for (var k = 0; k < bands.length; k++) { if (v >= bands[k].min) { idx = k; break; } }
+      var b = bands[idx], f = Math.max(0, Math.min(1, (v - b.min) / (b.max - b.min)));
+      return Math.max(14, Math.min(H - 14, idx * BH + (1 - f) * BH));
+    }
+    var r = function (x) { return Math.round(x * 10) / 10; };
+    var svg = '<svg class="mchart__svg" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Udvikling for ' + esc(m.name) + '">';
+    bands.forEach(function (b, k) { if (b.status === 'in') svg += '<rect class="mchart__zone" x="0" y="' + k * BH + '" width="' + W + '" height="' + BH + '"/>'; });
+    for (var k = 1; k <= bands.length; k++) {
+      var y = k === bands.length ? H - 1 : k * BH;
+      svg += '<line class="mchart__hline" x1="0" x2="' + W + '" y1="' + y + '" y2="' + y + '"/>';
+    }
+    xs.forEach(function (x) { svg += '<line class="mchart__vline" x1="' + x + '" x2="' + x + '" y1="0" y2="' + H + '"/>'; });
+    svg += '<line class="mchart__vline is-next" x1="' + xNext + '" x2="' + xNext + '" y1="0" y2="' + H + '"/>';
+    var pts = [];
+    m.history.forEach(function (v, k) { if (v !== null) pts.push({ x: xs[k], y: yOf(v), v: v, k: k }); });
+    svg += '<polyline class="mchart__line" points="' + pts.map(function (p) { return r(p.x) + ',' + r(p.y); }).join(' ') + '"/>';
+    var last = pts[pts.length - 1];
+    svg += '<line class="mchart__next-line" x1="' + r(last.x) + '" x2="' + xNext + '" y1="' + r(last.y) + '" y2="' + r(last.y) + '"/>';
+    pts.forEach(function (p, i) {
+      var out = isOut(m, p.k), isLast = i === pts.length - 1;
+      svg += isLast
+        ? '<circle class="mchart__dot is-' + (out ? 'out' : 'in') + '" cx="' + r(p.x) + '" cy="' + r(p.y) + '" r="8"/>'
+        : '<circle class="mchart__past is-' + (out ? 'out' : 'in') + '" cx="' + r(p.x) + '" cy="' + r(p.y) + '" r="5"/>';
+      var below = !out && !isLast, ly = below ? p.y + 26 : p.y - (isLast ? 15 : 14);
+      if (ly < 14) ly = p.y + 28;
+      svg += '<text class="mchart__label' + (isLast ? ' is-current' : '') + '" x="' + r(p.x) + '" y="' + r(ly) + '" text-anchor="middle">' + fmt(p.v, m.decimals) + '</text>';
+    });
+    svg += '<circle class="mchart__next" cx="' + xNext + '" cy="' + r(last.y) + '" r="6"/>';
+    svg += '</svg>';
+
+    var axis = D.tests.map(function (tst, k) {
+      var d = parseDate(tst.date);
+      return '<span style="--x:' + (xs[k] / W) + '"' + (k === n - 1 ? ' class="is-current"' : '') + '>' + MONTHS_SHORT[d.m] + ' ' + d.y + '</span>';
+    }).join('') + '<span class="is-next" style="--x:' + (xNext / W) + '">' + esc(D.nextTest.axisLabel) + '</span>';
+
+    return '<div class="mchart">' +
+      '<div class="mchart__bands">' + bands.map(function (b) {
+        return '<div class="mchart__band"><span class="range-band__bar is-' + b.status + '"></span>' +
+          '<span><span class="mchart__band-label">' + BAND_LABEL[b.status] + '</span><span class="mchart__band-range">' + esc(b.text.replace('–', ' – ')) + '</span></span></div>';
+      }).join('') + '</div>' +
+      '<div class="mchart__plot">' + svg + '</div>' +
+      '<div class="mchart__axis" aria-hidden="true">' + axis + '</div>' +
+    '</div>';
+  }
+
+  function initMarkoer() {
+    var m = markersById[param('id')] || markersById.fasteinsulin;
+    var t = LATEST, cat = categoriesById[m.categoryId];
+    var sibs = markersIn(cat.id, t), si = sibs.indexOf(m), n = sibs.length;
+    var c = D.markerContent[m.id] || {};
+    var st = statusAt(m, t), out = st !== 'in';
+    document.title = m.name + ' — Revigora';
+
+    var prev = sibs[(si - 1 + n) % n], next = sibs[(si + 1) % n];
+    document.querySelector('[data-crumbs]').innerHTML =
+      breadcrumbHTML([{ href: 'helbred.html', label: 'Dit helbred' }, { href: 'kategori.html?id=' + cat.id, label: cat.name }, { label: m.name }]) +
+      pagerHTML({ href: 'markoer.html?id=' + prev.id, label: 'Forrige markør: ' + prev.name },
+        (si + 1) + ' af ' + n + ' i ' + cat.name,
+        { href: 'markoer.html?id=' + next.id, label: 'Næste markør: ' + next.name });
+
+    // Head
+    var cur = valueAt(m, t), prevV = valueAt(m, t - 1);
+    var meta = 'Målt ' + dateLong(D.tests[t].date);
+    if (prevV !== null && prevV !== undefined) {
+      var dd = cur - prevV;
+      meta += ' · ' + (dd > 0 ? '+' : dd < 0 ? '−' : '±') + fmt(Math.abs(dd), m.decimals) + ' siden ' + MONTHS[parseDate(D.tests[t - 1].date).m];
+    }
+    document.querySelector('[data-marker-head]').innerHTML =
+      '<div class="marker-head__copy">' +
+        '<p class="eyebrow">' + esc(cat.name) + (c.eyebrow ? ' · ' + esc(c.eyebrow) : '') + '</p>' +
+        '<h1 class="marker-head__title">' + esc(m.name) + '</h1>' +
+        '<p class="marker-head__lead">' + esc(c.lead || m.description) + '</p>' +
+      '</div>' +
+      '<div class="marker-head__value">' +
+        '<span class="status-tag status-tag--' + (out ? 'out' : 'in') + '"><span class="dot dot--' + (out ? 'out' : 'in') + '"></span>' + STATUS_LABEL[st] + '</span>' +
+        '<p class="marker-head__number"><span>' + fmt(cur, m.decimals) + '</span>' + esc(m.unit) + '</p>' +
+        '<p class="marker-head__meta">' + meta + '</p>' +
+      '</div>';
+
+    // Chart card
+    var firstIdx = 0; while (valueAt(m, firstIdx) === null) firstIdx++;
+    var diff = cur - valueAt(m, firstIdx);
+    var good = m.better ? (m.better === 'lower' ? diff < 0 : diff > 0) : null;
+    var count = m.history.filter(function (v) { return v !== null; }).length;
+    document.querySelector('[data-chart-card]').innerHTML =
+      '<div class="chart-card__head"><p class="eyebrow">Din udvikling · ' + count + ' målinger</p>' +
+      (firstIdx < t ? '<p class="chart-card__delta' + (good === true ? ' is-good' : good === false ? ' is-bad' : '') + '">' +
+        (diff === 0 ? 'Uændret' : (diff < 0 ? '↓ ' : '↑ ') + fmt(Math.abs(diff), m.decimals) + ' ' + esc(m.unit)) +
+        ' siden ' + monthYear(D.tests[firstIdx].date) + '</p>' : '') + '</div>' +
+      markerChart(m);
+
+    // Left column
+    var note = D.notes.markers[m.id];
+    var left = '';
+    if (note) {
+      left += '<article class="card note-card">' +
+        '<div class="note-card__head"><h2 class="note-card__title">Lægeteamets kommentar</h2><span class="note-card__icon">' + ICON.steth + '</span></div>' +
+        '<p class="note-card__meta">' + D.notes.overall.date + ' · Revigoras lægeteam</p>' +
+        '<p class="note-card__text">' + esc(note) + '</p></article>';
+    }
+    if (c.about) {
+      left += '<section class="prose-block"><h2>' + esc(c.aboutTitle) + '</h2>' + c.about.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</section>';
+    }
+    if (!left) {
+      left = '<section class="prose-block"><h2>Om ' + esc(m.name) + '</h2><p>' + esc(m.description) + '</p></section>';
+    }
+    document.querySelector('[data-marker-left]').innerHTML = left;
+
+    // Right column
+    var right = '';
+    if (c.actions) {
+      right += '<div class="ink-card actions-card"><p class="ink-card__eyebrow">Det kan du gøre</p>' +
+        '<ol class="actions-card__list">' + c.actions.map(function (a, i) {
+          return '<li><span class="actions-card__num">' + ('0' + (i + 1)) + '</span><span>' + esc(a) + '</span></li>';
+        }).join('') + '</ol>' +
+        '<a class="btn-mint btn-mint--44" href="handlingsplan.html">Se din handlingsplan</a></div>';
+    }
+    var dd2 = parseDate(D.tests[t].date);
+    right += '<dl class="card details-card">' +
+      '<div><dt>Revigoras område</dt><dd class="is-mono">' + rangeText(m) + ' ' + esc(m.unit) + '</dd></div>' +
+      (c.labLimit ? '<div><dt>Laboratoriets grænse</dt><dd class="is-mono">' + esc(c.labLimit) + ' ' + esc(m.unit) + '</dd></div>' : '') +
+      '<div><dt>Prøve taget</dt><dd>' + dd2.d + '. ' + MONTHS_SHORT[dd2.m] + ' ' + dd2.y + ', kl. ' + D.sampleTimes[t] + '</dd></div>' +
+      '<div><dt>Analyseret af</dt><dd>' + esc(D.lab) + '</dd></div>' +
+    '</dl>';
+    var related = (c.related || sibs.filter(function (s) { return s !== m; }).slice(0, 2).map(function (s) { return s.id; }))
+      .map(function (id) { return markersById[id]; }).filter(Boolean);
+    if (related.length) {
+      right += '<div class="related"><p class="eyebrow">Relaterede markører</p><div class="link-cards">' + related.map(function (r) {
+        var o = isOut(r, t);
+        return '<a class="link-card" href="markoer.html?id=' + r.id + '"><span class="link-card__name"><span class="dot dot--' + (o ? 'out' : 'in') + '"></span>' + esc(shortName(r)) + '</span>' +
+          '<span class="link-card__value">' + fmt(valueAt(r, t), r.decimals) + ' ' + esc(r.unit) + ' →</span></a>';
+      }).join('') + '</div></div>';
+    }
+    document.querySelector('[data-marker-right]').innerHTML = right;
+  }
+
+  /* ============================= Page: Noter ============================== */
+
+  function initNoter() {
+    var reports = D.notes.reports;
+    var rail = document.querySelector('[data-note-rail]');
+    var article = document.querySelector('[data-note-article]');
+    var active = 0;
+    function render() {
+      rail.innerHTML = reports.map(function (r, i) {
+        return '<button type="button" class="rail-link' + (i === active ? ' is-active' : '') + '" aria-pressed="' + (i === active) + '" data-report="' + i + '">' +
+          MORE_ICONS.doc + dateShort(r.date) + '</button>';
+      }).join('');
+      var r = reports[active], tst = D.tests[r.testIndex];
+      var count = D.markers.filter(function (m) { return hasValue(m, r.testIndex); }).length;
+      article.innerHTML =
+        '<header class="note-article__head"><h2 class="note-article__date">' + dateLong(r.date) + '</h2>' +
+          '<p class="note-article__meta">Test ' + (r.testIndex + 1) + ' af ' + D.tests.length + ' · ' + esc(tst.package) + ' · ' + count + ' biomarkører</p></header>' +
+        '<section class="prose-block prose-block--sm"><h3>Opsummering</h3>' + r.summary.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</section>' +
+        '<div class="note-lists">' +
+          '<div class="card note-list"><p class="note-list__title is-good">Det går godt</p><ul>' + r.good.map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
+          '<div class="card note-list"><p class="note-list__title is-watch">Det holder vi øje med</p><ul class="is-watch">' + r.watch.map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') + '</ul></div>' +
+        '</div>' +
+        '<section class="prose-block prose-block--sm"><h3>Vores anbefaling</h3><p>' + esc(r.recommendation) + '</p></section>' +
+        '<footer class="note-article__foot">' +
+          '<div class="byline"><span class="byline__icon">' + ICON.steth + '</span><span><span class="byline__name">Revigoras lægeteam</span><span class="byline__sub">Gennemgået ' + dateLong(r.date) + '</span></span></div>' +
+          '<a class="btn-mint btn-mint--44" href="handlingsplan.html">Se din handlingsplan →</a>' +
+        '</footer>';
+    }
+    rail.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-report]'); if (!b) return;
+      active = +b.getAttribute('data-report');
+      render();
+      rail.querySelector('[data-report="' + active + '"]').focus();
+    });
+    document.querySelector('[data-print]').addEventListener('click', function () { window.print(); });
+    render();
+  }
+
+  /* ========================== Page: Handlingsplan ========================= */
+
+  var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ'.split('');
+
+  function initHandlingsplan() {
+    var plan = D.plan, diet = plan.diet, sup = plan.supplements;
+    var state = { section: location.hash === '#tilskud' ? 'tilskud' : 'kost', list: 'enjoy', query: '' };
+    var c = counts(LATEST);
+    document.querySelector('[data-plan-eyebrow]').textContent = 'Baseret på din test fra ' + dateLong(D.tests[LATEST].date);
+    document.querySelector('[data-plan-intro]').textContent = 'Målrettet mod dine ' + c.out + ' markører uden for området. Planen opdateres automatisk efter hver ny test.';
+    var targetsHTML = '<span class="targets__label">Rettet mod</span>' + plan.targets.map(targetTag).join('');
+    document.querySelectorAll('[data-plan-targets]').forEach(function (el) { el.innerHTML = targetsHTML; });
+    document.querySelector('[data-diet-intro]').textContent = diet.intro;
+    document.querySelector('[data-sup-intro]').textContent = sup.intro;
+
+    var navBtns = document.querySelectorAll('[data-plan-nav]');
+    var panes = { kost: document.getElementById('kost'), tilskud: document.getElementById('tilskud') };
+    function showSection(s, push) {
+      state.section = s;
+      navBtns.forEach(function (b) {
+        var on = b.getAttribute('data-plan-nav') === s;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', String(on));
+        b.tabIndex = on ? 0 : -1;
+      });
+      panes.kost.hidden = s !== 'kost';
+      panes.tilskud.hidden = s !== 'tilskud';
+      if (push) history.replaceState(null, '', s === 'tilskud' ? '#tilskud' : location.pathname);
+    }
+    navBtns.forEach(function (b) {
+      b.addEventListener('click', function () { showSection(b.getAttribute('data-plan-nav'), true); });
+      b.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        e.preventDefault();
+        var s = state.section === 'kost' ? 'tilskud' : 'kost';
+        showSection(s, true);
+        document.querySelector('[data-plan-nav="' + s + '"]').focus();
+      });
+    });
+    window.addEventListener('hashchange', function () { showSection(location.hash === '#tilskud' ? 'tilskud' : 'kost'); });
+
+    // Kost
+    var seg = document.querySelectorAll('[data-diet-list]');
+    var lettersEl = document.querySelector('[data-letters]');
+    var foodsEl = document.querySelector('[data-foods]');
+    seg[0].querySelector('[data-seg-label]').textContent = 'Nyd disse · ' + diet.enjoy.length;
+    seg[1].querySelector('[data-seg-label]').textContent = 'Begræns disse · ' + diet.limit.length;
+    function slug(l) { return 'bogstav-' + state.list + '-' + l.toLowerCase(); }
+    function renderFoods() {
+      var limit = state.list === 'limit';
+      seg.forEach(function (b) {
+        var on = b.getAttribute('data-diet-list') === state.list;
+        b.classList.toggle('is-active', on); b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+      });
+      var items = (limit ? diet.limit : diet.enjoy).filter(function (f) {
+        return !state.query || f.toLowerCase().indexOf(state.query.toLowerCase()) > -1;
+      });
+      var groups = {};
+      items.forEach(function (f) { var l = f.charAt(0).toUpperCase(); (groups[l] = groups[l] || []).push(f); });
+      lettersEl.innerHTML = ALPHABET.map(function (l) {
+        return groups[l]
+          ? '<a href="#' + slug(l) + '" class="letters__l">' + l + '</a>'
+          : '<span class="letters__l is-empty" aria-hidden="true">' + l + '</span>';
+      }).join('');
+      var top = limit ? diet.limitTop : diet.enjoyTop;
+      foodsEl.className = 'foods' + (limit ? ' is-limit' : '');
+      foodsEl.innerHTML =
+        (state.query ? '' : '<div class="card top-list"><h3 class="top-list__title">' + (limit ? 'Begræns mest' : 'Dine top 5') + '</h3><ol>' +
+          top.map(function (f, i) {
+            return '<li><span class="top-list__num">' + ('0' + (i + 1)) + '</span><span class="top-list__name">' + esc(f.name) + '</span><span class="top-list__targets">' + esc(f.targets) + '</span></li>';
+          }).join('') + '</ol></div>') +
+        ALPHABET.filter(function (l) { return groups[l]; }).map(function (l) {
+          return '<section class="letter-group" id="' + slug(l) + '" aria-label="' + l + '"><h3 class="letter-group__l" aria-hidden="true">' + l + '</h3><ul>' +
+            groups[l].map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></section>';
+        }).join('') +
+        (items.length ? '' : '<p class="list-empty">Ingen fødevarer matcher “' + esc(state.query) + '”.</p>');
+    }
+    seg.forEach(function (b) {
+      b.addEventListener('click', function () { state.list = b.getAttribute('data-diet-list'); renderFoods(); });
+    });
+    var searchWrap = document.querySelector('[data-food-search]');
+    var searchInput = searchWrap.querySelector('input');
+    document.querySelector('[data-food-search-open]').addEventListener('click', function (e) {
+      var open = !searchWrap.classList.contains('is-open');
+      searchWrap.classList.toggle('is-open', open);
+      e.currentTarget.setAttribute('aria-expanded', String(open));
+      if (open) searchInput.focus(); else { searchInput.value = ''; state.query = ''; renderFoods(); }
+    });
+    searchInput.addEventListener('input', function () { state.query = searchInput.value.trim(); renderFoods(); });
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { searchInput.value = ''; state.query = ''; searchWrap.classList.remove('is-open'); renderFoods(); }
+    });
+    renderFoods();
+
+    // Tilskud
+    document.querySelector('[data-supplements]').innerHTML =
+      sup.items.slice(0, 2).map(function (s, i) {
+        return '<article class="card supp-card' + (i === 0 ? ' is-top' : '') + '">' +
+          '<span class="supp-card__rank">' + (i + 1) + '</span>' +
+          '<div class="supp-card__body">' +
+            '<div class="supp-card__head"><h3>' + esc(s.name) + '</h3>' + (s.badge ? '<span class="tag tag--mint">' + esc(s.badge) + '</span>' : '') + '</div>' +
+            '<p class="supp-card__dose">' + esc(s.dose) + '</p>' +
+            '<p class="supp-card__why">' + esc(s.why) + '</p>' +
+            '<div class="targets targets--sm"><span class="targets__label">Rettet mod</span>' + s.targets.map(targetTag).join('') + '</div>' +
+          '</div></article>';
+      }).join('') +
+      '<div class="card supp-list">' + sup.items.slice(2).map(function (s, i) {
+        return '<div class="supp-row"><span class="supp-row__rank">' + (i + 3) + '</span>' +
+          '<span class="supp-row__body"><span class="supp-row__name">' + esc(s.name) + '</span><span class="supp-row__dose">' + esc(s.dose) + '</span></span>' +
+          '<span class="supp-row__targets">' + esc(s.targetsText) + '</span></div>';
+      }).join('') + '</div>' +
+      '<div class="not-needed"><p class="eyebrow">Ikke nødvendigt for dig lige nu</p><p>' + esc(sup.notNeeded) + '</p></div>' +
+      '<div class="disclaimer">' + MORE_ICONS.info + '<p>' + esc(sup.disclaimer) + '</p></div>';
+
+    showSection(state.section);
+  }
+
+  /* ============================ Page: Historik ============================ */
+
+  var KEY_MARKERS = ['apob', 'ldl', 'fasteinsulin', 'hba1c', 'd-vitamin', 'ferritin', 'hs-crp'];
+
+  function trendOf(m) {
+    var t = LATEST, cur = valueAt(m, t), prev = valueAt(m, t - 1);
+    if (m.trendNote) return { text: m.trendNote, kind: 'neutral' };
+    if (isImproving(m, t)) return { text: (cur < prev ? '↓ ' : '↑ ') + 'Forbedres', kind: 'good' };
+    if (prev === null || cur === prev) return { text: '→ Stabil', kind: 'neutral' };
+    var up = cur > prev;
+    var bad = m.better && (m.better === 'lower' ? up : !up);
+    return { text: up ? '↑ Stigende' : '↓ Faldende', kind: bad ? 'bad' : 'neutral' };
+  }
+
+  function initHistorik() {
+    var n = D.tests.length, first = D.tests[0], last = D.tests[n - 1];
+    var mode = 'key';
+    document.querySelector('[data-hist-eyebrow]').textContent = n + ' tests · siden ' + monthYear(first.date);
+    document.querySelector('[data-bio-trend]').innerHTML =
+      '<p class="eyebrow">Biologisk alder</p>' +
+      '<p class="bio-trend__values"><span class="bio-trend__from">' + fmt(first.bioAge, 1) + '</span><span class="bio-trend__arrow" aria-label="til">→</span>' +
+      '<span class="bio-trend__to">' + fmt(last.bioAge, 1) + '</span><span class="bio-trend__unit">år</span></p>';
+
+    document.querySelector('[data-test-cards]').innerHTML = D.tests.slice().reverse().map(function (tst) {
+      var i = D.tests.indexOf(tst), latest = i === n - 1, c = counts(i);
+      return '<article class="test-card' + (latest ? ' ink-card' : ' card') + '">' +
+        '<div class="test-card__top"><p class="test-card__eyebrow">' + (latest ? 'Seneste' : 'Test ' + (i + 1)) + '</p>' +
+          '<button type="button" class="test-card__dl" aria-label="Download PDF for testen ' + dateShort(tst.date) + '" data-download>' + MORE_ICONS.download + '</button></div>' +
+        '<h2 class="test-card__date"><a href="helbred.html' + (latest ? '' : '?test=' + i) + '">' + dateShort(tst.date) + '</a></h2>' +
+        '<p class="test-card__pkg">' + esc(tst.package) + '</p>' +
+        '<p class="test-card__counts"><span class="is-in">' + c.in + ' i området</span>' + (c.out ? '<span class="is-out">' + c.out + ' uden for</span>' : '') + '</p>' +
+      '</article>';
+    }).join('');
+    document.querySelector('[data-test-cards]').addEventListener('click', function (e) {
+      if (e.target.closest('[data-download]')) demoAlert('PDF-download er ikke en del af mockuppen.');
+    });
+
+    var table = document.querySelector('[data-compare]');
+    var toggles = document.querySelectorAll('[data-compare-mode]');
+    toggles[1].textContent = 'Alle ' + counts(LATEST).total;
+    function render() {
+      toggles.forEach(function (b) {
+        var on = b.getAttribute('data-compare-mode') === mode;
+        b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', String(on));
+      });
+      var markers = mode === 'key' ? KEY_MARKERS.map(function (id) { return markersById[id]; }) : D.markers;
+      var head = '<thead><tr><th scope="col">Markør</th>' + D.tests.map(function (tst, i) {
+        return '<th scope="col" class="is-num' + (i === n - 1 ? ' is-current' : '') + '">' + dateAxis(tst.date) + '</th>';
+      }).join('') + '<th scope="col" class="is-trend">Tendens</th></tr></thead>';
+      var rows = markers.map(function (m) {
+        var tr = trendOf(m);
+        return '<tr><th scope="row"><a href="markoer.html?id=' + m.id + '">' + esc(shortName(m)) + '</a><span>' + esc(m.unit) + (m.unit ? ' · ' : '') + rangeText(m, ' – ') + '</span></th>' +
+          D.tests.map(function (tst, i) {
+            var v = valueAt(m, i);
+            if (v === null) return '<td class="is-num is-empty">–</td>';
+            return '<td class="is-num' + (isOut(m, i) ? ' is-out' : '') + (i === n - 1 ? ' is-current' : '') + '">' + fmt(v, m.decimals) +
+              (isOut(m, i) ? '<span class="visually-hidden"> (uden for området)</span>' : '') + '</td>';
+          }).join('') +
+          '<td class="is-trend is-' + tr.kind + '">' + tr.text + '</td></tr>';
+      }).join('');
+      var bio = '<tr><th scope="row"><span class="th-name">Biologisk alder</span><span>år · faktisk alder ' + D.user.age + '</span></th>' +
+        D.tests.map(function (tst, i) { return '<td class="is-num' + (i === n - 1 ? ' is-current' : '') + '">' + fmt(tst.bioAge, 1) + '</td>'; }).join('') +
+        '<td class="is-trend is-' + (last.bioAge < D.tests[n - 2].bioAge ? 'good">↓ Forbedres' : 'neutral">→ Stabil') + '</td></tr>';
+      table.innerHTML = head + '<tbody>' + rows + bio + '</tbody>';
+    }
+    toggles.forEach(function (b) { b.addEventListener('click', function () { mode = b.getAttribute('data-compare-mode'); render(); }); });
+    render();
+  }
+
+  /* ============================ Page: Bestil ============================== */
+
+  function initBestil() {
+    var o = D.order;
+    var state = { pkg: o.defaultPackage, city: o.cities[0].id, day: o.defaultDay, slot: o.defaultSlot };
+    var rec = document.querySelector('[data-recommendation]');
+    rec.querySelector('[data-rec-title]').textContent = o.recommendation.title;
+    rec.querySelector('[data-rec-text]').textContent = o.recommendation.text;
+
+    var pkgEl = document.querySelector('[data-packages]');
+    pkgEl.innerHTML = o.packages.map(function (p) {
+      return '<label class="package">' +
+        '<input type="radio" name="package" value="' + p.id + '"' + (p.id === state.pkg ? ' checked' : '') + '>' +
+        '<span class="package__radio" aria-hidden="true"></span>' +
+        '<span class="package__body">' +
+          '<span class="package__head"><span class="package__name">' + esc(p.name) + '</span>' + (p.tag ? '<span class="tag tag--' + p.tagKind + '">' + esc(p.tag) + '</span>' : '') + '</span>' +
+          '<span class="package__desc">' + esc(p.description) + '</span>' +
+          (p.highlight ? '<span class="package__highlight">' + esc(p.highlight) + '</span>' : '') +
+        '</span>' +
+        '<span class="package__price"><span>' + kr(p.price) + '</span>' + esc(p.priceUnit) + '</span>' +
+      '</label>';
+    }).join('');
+    pkgEl.addEventListener('change', function (e) { state.pkg = e.target.value; renderSummary(); });
+
+    var cityEl = document.querySelector('[data-cities]');
+    var daysEl = document.querySelector('[data-days]');
+    var slotsEl = document.querySelector('[data-slots]');
+    function unavailable(day) { return (o.unavailable[state.city] || {})[day || state.day] || []; }
+    function ensureSlot() {
+      if (unavailable().indexOf(state.slot) > -1) {
+        state.slot = o.slots.filter(function (s) { return unavailable().indexOf(s) === -1; })[0] || null;
+      }
+    }
+    function renderBooking() {
+      var city = o.cities.filter(function (c) { return c.id === state.city; })[0];
+      cityEl.innerHTML = o.cities.map(function (c) {
+        var on = c.id === state.city;
+        return '<button type="button" class="city-chip' + (on ? ' is-active' : '') + '" aria-pressed="' + on + '" data-city="' + c.id + '">' + esc(c.name) + '</button>';
+      }).join('');
+      document.querySelector('[data-clinic-name]').textContent = city.clinic;
+      document.querySelector('[data-clinic-address]').textContent = city.address + ' · ' + o.duration;
+      daysEl.innerHTML = o.days.map(function (day) {
+        var d = parseDate(day), on = day === state.day;
+        return '<button type="button" class="day' + (on ? ' is-active' : '') + '" aria-pressed="' + on + '" data-day="' + day + '" aria-label="' + cap(weekday(day)) + ' ' + d.d + '. ' + MONTHS[d.m] + '">' +
+          '<span class="day__wd">' + weekday(day).slice(0, 3) + '</span><span class="day__d">' + d.d + '</span><span class="day__m">' + MONTHS_SHORT[d.m] + '</span></button>';
+      }).join('');
+      var un = unavailable();
+      slotsEl.innerHTML = o.slots.map(function (s) {
+        var off = un.indexOf(s) > -1, on = s === state.slot;
+        return '<button type="button" class="slot' + (on ? ' is-active' : '') + '" data-slot="' + s + '" aria-pressed="' + on + '"' +
+          (off ? ' disabled aria-label="' + s + ', optaget"' : '') + '>' + s + '</button>';
+      }).join('');
+      renderSummary();
+    }
+    function renderSummary() {
+      var p = o.packages.filter(function (x) { return x.id === state.pkg; })[0];
+      var city = o.cities.filter(function (c) { return c.id === state.city; })[0];
+      var d = parseDate(state.day);
+      document.querySelector('[data-sum-name]').textContent = p.name;
+      document.querySelector('[data-sum-price]').textContent = kr(p.price);
+      document.querySelector('[data-sum-note]').textContent = p.summaryNote;
+      document.querySelector('[data-sum-when]').textContent = cap(weekday(state.day)) + ' ' + d.d + '. ' + MONTHS[d.m] + (state.slot ? ' · kl. ' + state.slot : ' · vælg et tidspunkt');
+      document.querySelector('[data-sum-where]').textContent = city.clinic;
+      document.querySelector('[data-sum-total]').textContent = kr(p.price);
+    }
+    cityEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-city]'); if (!b) return;
+      state.city = b.getAttribute('data-city'); ensureSlot(); renderBooking();
+      cityEl.querySelector('[data-city="' + state.city + '"]').focus();
+    });
+    document.querySelector('[data-switch-clinic]').addEventListener('click', function () {
+      var i = o.cities.map(function (c) { return c.id; }).indexOf(state.city);
+      state.city = o.cities[(i + 1) % o.cities.length].id; ensureSlot(); renderBooking();
+    });
+    daysEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-day]'); if (!b) return;
+      state.day = b.getAttribute('data-day'); ensureSlot(); renderBooking();
+      daysEl.querySelector('[data-day="' + state.day + '"]').focus();
+    });
+    slotsEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-slot]'); if (!b || b.disabled) return;
+      state.slot = b.getAttribute('data-slot'); renderBooking();
+      slotsEl.querySelector('[data-slot="' + state.slot + '"]').focus();
+    });
+    document.querySelector('[data-fasting]').textContent = o.fastingNote;
+    document.querySelector('[data-pay-methods]').textContent = o.paymentMethods;
+    document.querySelector('[data-included]').innerHTML = o.included.map(function (x) { return '<li>' + MORE_ICONS.check + '<span>' + esc(x) + '</span></li>'; }).join('');
+    document.querySelector('[data-checkout]').addEventListener('click', function () {
+      demoAlert('Trin 2 (betaling) er ikke designet endnu.');
+    });
+    ensureSlot();
+    renderBooking();
+  }
+
+  /* ============================= Page: Profil ============================= */
+
+  function initProfil() {
+    var u = D.user, p = D.profile, d = parseDate(u.birthDate);
+    document.querySelector('[data-profile-initials]').textContent = u.initials;
+    document.querySelector('[data-profile-name]').textContent = u.firstName + ' ' + u.lastName;
+    document.querySelector('[data-profile-sub]').textContent = 'Kunde siden ' + p.customerSince + ' · ' + D.tests.length + ' tests';
+
+    function row(label, value, action) {
+      return '<div class="settings-row"><span class="settings-row__label">' + label + '</span><span class="settings-row__value">' + value + '</span>' + action + '</div>';
+    }
+    var edit = function (what) { return '<button type="button" class="text-btn" data-edit="' + what + '">Rediger</button>'; };
+    document.querySelector('[data-personal]').innerHTML =
+      row('Navn', esc(u.firstName + ' ' + u.lastName), edit('navn')) +
+      row('E-mail', esc(p.email), edit('e-mail')) +
+      row('Telefon', esc(p.phone), edit('telefon')) +
+      row('Fødselsdato · køn', d.d + '. ' + MONTHS[d.m] + ' ' + d.y + ' · ' + (u.sex === 'male' ? 'Mand' : 'Kvinde'), '<span class="settings-row__note">Bruges til dine områder</span>') +
+      row('Login', esc(p.login), '<span class="settings-row__ok"><span class="dot dot--7 dot--in"></span>Bekræftet</span>');
+    document.querySelector('[data-membership-eyebrow]').textContent = p.membership.eyebrow;
+    document.querySelector('[data-membership-text]').textContent = p.membership.text;
+    document.querySelector('[data-language]').innerHTML = row('Sprog', esc(p.language), '');
+
+    function stored(id, def) {
+      try { var v = localStorage.getItem('rv-pref-' + id); return v === null ? def : v === '1'; } catch (e) { return def; }
+    }
+    function toggleRow(t) {
+      var on = t.locked ? true : stored(t.id, t.on);
+      return '<div class="settings-row settings-row--toggle">' +
+        '<span class="settings-row__text"><span class="settings-row__title" id="pref-' + t.id + '">' + esc(t.title) + '</span><span class="settings-row__sub">' + esc(t.sub) + '</span></span>' +
+        '<button type="button" class="switch" role="switch" aria-checked="' + on + '" aria-labelledby="pref-' + t.id + '" data-pref="' + t.id + '"' +
+          (t.locked ? ' aria-disabled="true" disabled' : '') + '><span class="switch__knob"></span></button>' +
+      '</div>';
+    }
+    document.querySelector('[data-notifications]').innerHTML = p.notifications.map(toggleRow).join('');
+    document.querySelector('[data-consents]').innerHTML = p.consents.map(toggleRow).join('') +
+      '<div class="settings-row settings-row--actions"><button type="button" class="text-btn text-btn--underline" data-download-data>Download alle mine data</button>' +
+      '<button type="button" class="text-btn text-btn--danger" data-delete-account>Slet konto</button></div>';
+
+    document.addEventListener('click', function (e) {
+      var sw = e.target.closest('[data-pref]');
+      if (sw && !sw.disabled) {
+        var on = sw.getAttribute('aria-checked') !== 'true';
+        sw.setAttribute('aria-checked', String(on));
+        try { localStorage.setItem('rv-pref-' + sw.getAttribute('data-pref'), on ? '1' : '0'); } catch (err) {}
+      }
+      if (e.target.closest('[data-edit]')) demoAlert('Redigering af ' + e.target.closest('[data-edit]').getAttribute('data-edit') + ' er ikke en del af mockuppen.');
+      if (e.target.closest('[data-download-data]')) demoAlert('Dataudtræk er ikke en del af mockuppen.');
+      if (e.target.closest('[data-delete-account]')) demoAlert('Sletning af konto er ikke en del af mockuppen.');
+    });
+    scrollSpy(Array.prototype.slice.call(document.querySelectorAll('[data-settings-nav] a')), function () { return 72 + 120; });
+  }
+
   /* ================================ Boot ================================= */
 
   renderHeader();
@@ -749,7 +1518,8 @@
   document.body.classList.remove('no-js');
 
   var page = document.body.getAttribute('data-page');
-  if (page === 'helbred') initHelbred();
+  var PAGES = { helbred: initHelbred, kategori: initKategori, markoer: initMarkoer, noter: initNoter, handlingsplan: initHandlingsplan, historik: initHistorik, bestil: initBestil, profil: initProfil };
+  if (PAGES[page]) PAGES[page]();
 
   // Exposed for the other page scripts added later (kategori, markør, …)
   window.RV = {
