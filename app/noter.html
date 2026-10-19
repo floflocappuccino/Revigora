@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lægeteamets noter — Revigora</title>
+  <meta name="robots" content="noindex">
+  <script src="../assets/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=4">
+</head>
+<body class="app-body no-js" data-page="noter">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+  <a class="skip-link" href="#main">Spring til indhold</a>
+
+  <header data-app-header></header>
+
+  <main class="app-main app-main--mid" id="main">
+    <div class="app-container app-stack app-stack--40">
+
+      <nav class="breadcrumb" aria-label="Brødkrumme"><ol>
+        <li><a href="helbred.html">Dit helbred</a><span class="breadcrumb__sep" aria-hidden="true">/</span></li>
+        <li><span aria-current="page">Lægeteamets noter</span></li>
+      </ol></nav>
+
+      <div class="page-header page-header--ruled">
+        <div class="page-header__title-row">
+          <h1 class="page-header__title page-header__title--72">Lægeteamets noter</h1>
+          <svg class="page-header__icon" width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a5 5 0 0 0 10 0V3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 14v2.5a4.5 4.5 0 0 0 9 0V14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="20" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        </div>
+        <button type="button" class="pill-btn pill-btn--40 pill-btn--surface" data-print>
+          <svg class="icon-14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M8 10L5 7M8 10l3-3M3 13h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download PDF
+        </button>
+      </div>
+
+      <div class="rail-layout rail-layout--notes">
+        <nav class="rail" aria-label="Noter efter dato" data-note-rail></nav>
+        <article class="note-article" aria-live="polite" data-note-article></article>
+      </div>
+
+    </div>
+  </main>
+
+  <nav data-app-tabbar></nav>
+
+  <script src="../assets/js/app-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
