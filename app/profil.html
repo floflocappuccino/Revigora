@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profil &amp; indstillinger — Revigora</title>
+  <meta name="robots" content="noindex">
+  <script src="../assets/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=4">
+</head>
+<body class="app-body no-js" data-page="profil">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+  <a class="skip-link" href="#main">Spring til indhold</a>
+
+  <header data-app-header></header>
+
+  <main class="app-main" id="main">
+    <div class="app-container app-stack app-stack--40">
+
+      <div class="profile-head">
+        <span class="profile-head__avatar" aria-hidden="true" data-profile-initials></span>
+        <div class="profile-head__copy">
+          <h1 class="profile-head__name" data-profile-name></h1>
+          <p class="profile-head__sub" data-profile-sub></p>
+        </div>
+        <a class="pill-btn pill-btn--44" href="login.html">
+          <svg class="icon-15" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5H3.5v11H6M10.5 5l3 3-3 3M13.5 8H6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Log ud
+        </a>
+      </div>
+
+      <div class="rail-layout">
+        <nav class="rail rail--sticky" aria-label="Indstillinger" data-settings-nav>
+          <a class="rail-link rail-link--42" href="#personlige-oplysninger">Personlige oplysninger</a>
+          <a class="rail-link rail-link--42" href="#medlemskab">Medlemskab</a>
+          <a class="rail-link rail-link--42" href="#notifikationer">Notifikationer</a>
+          <a class="rail-link rail-link--42" href="#data-og-samtykke">Data og samtykke</a>
+          <a class="rail-link rail-link--42" href="#sprog">Sprog</a>
+        </nav>
+
+        <div class="rail-content rail-content--gap40">
+          <section class="settings-section" id="personlige-oplysninger" aria-labelledby="h-personal">
+            <h2 class="settings-section__title" id="h-personal">Personlige oplysninger</h2>
+            <div class="card settings-card" data-personal></div>
+          </section>
+
+          <section class="settings-section" id="medlemskab" aria-labelledby="h-membership">
+            <h2 class="settings-section__title" id="h-membership">Medlemskab</h2>
+            <div class="ink-card membership-card">
+              <div class="membership-card__copy">
+                <p class="membership-card__eyebrow" data-membership-eyebrow></p>
+                <p class="membership-card__text" data-membership-text></p>
+              </div>
+              <a class="btn-mint btn-mint--44" href="bestil.html">Bliv medlem</a>
+            </div>
+          </section>
+
+          <section class="settings-section" id="notifikationer" aria-labelledby="h-notifications">
+            <h2 class="settings-section__title" id="h-notifications">Notifikationer</h2>
+            <div class="card settings-card" data-notifications></div>
+          </section>
+
+          <section class="settings-section" id="data-og-samtykke" aria-labelledby="h-consent">
+            <h2 class="settings-section__title" id="h-consent">Data og samtykke</h2>
+            <div class="card settings-card" data-consents></div>
+          </section>
+
+          <section class="settings-section" id="sprog" aria-labelledby="h-language">
+            <h2 class="settings-section__title" id="h-language">Sprog</h2>
+            <div class="card settings-card" data-language></div>
+          </section>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <nav data-app-tabbar></nav>
+
+  <script src="../assets/js/app-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
