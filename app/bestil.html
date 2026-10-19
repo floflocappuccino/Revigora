@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bestil ny test — Revigora</title>
+  <meta name="robots" content="noindex">
+  <script src="../assets/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=4">
+</head>
+<body class="app-body no-js" data-page="bestil">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+  <a class="skip-link" href="#main">Spring til indhold</a>
+
+  <header data-app-header></header>
+
+  <main class="app-main" id="main">
+    <div class="app-container app-stack app-stack--40">
+
+      <div class="page-header page-header--ruled">
+        <div class="page-header__copy">
+          <p class="eyebrow">Trin 1 af 2 · Vælg test og tid</p>
+          <h1 class="page-header__title page-header__title--72">Bestil ny test</h1>
+        </div>
+        <div class="recommendation" data-recommendation>
+          <svg class="icon-20" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a5 5 0 0 0 10 0V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11 14v2.5a4.5 4.5 0 0 0 9 0V14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          <div><p class="recommendation__title" data-rec-title></p><p class="recommendation__text" data-rec-text></p></div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="split__main split__main--gap20">
+          <fieldset class="order-step">
+            <legend class="order-step__title">1. Vælg test</legend>
+            <div class="packages" data-packages></div>
+          </fieldset>
+
+          <section class="order-step order-step--spaced" aria-labelledby="step-2">
+            <h2 class="order-step__title" id="step-2">2. Vælg klinik og tid</h2>
+            <div class="city-chips" role="group" aria-label="By" data-cities></div>
+            <div class="card booking">
+              <div class="booking__head">
+                <div>
+                  <p class="booking__clinic" data-clinic-name></p>
+                  <p class="booking__address" data-clinic-address></p>
+                </div>
+                <button type="button" class="text-btn text-btn--underline text-btn--13" data-switch-clinic>Skift klinik</button>
+              </div>
+              <div class="days" role="group" aria-label="Dag" data-days></div>
+              <div class="slots" role="group" aria-label="Tidspunkt" data-slots></div>
+              <div class="disclaimer disclaimer--sm">
+                <svg class="icon-18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 9v4.5M10 6.5v.01" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <p data-fasting></p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="split__side" aria-label="Din bestilling">
+          <div class="ink-card summary" aria-live="polite">
+            <p class="ink-card__eyebrow">Din bestilling</p>
+            <div class="summary__block">
+              <div class="summary__line"><p class="summary__name" data-sum-name></p><p class="summary__price" data-sum-price></p></div>
+              <p class="summary__note" data-sum-note></p>
+            </div>
+            <div class="summary__block summary__block--gap10">
+              <p class="summary__meta">
+                <svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h14M7 2v4M13 2v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                <span data-sum-when></span>
+              </p>
+              <p class="summary__meta">
+                <svg class="icon-16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+                <span data-sum-where></span>
+              </p>
+            </div>
+            <div class="summary__total"><span>I alt i dag</span><strong data-sum-total></strong></div>
+            <button type="button" class="btn-mint btn-mint--50" data-checkout>Fortsæt til betaling →</button>
+            <p class="summary__methods" data-pay-methods></p>
+          </div>
+          <div class="included">
+            <p class="eyebrow">Inkluderet</p>
+            <ul data-included></ul>
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+
+  <nav data-app-tabbar></nav>
+
+  <script src="../assets/js/app-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
