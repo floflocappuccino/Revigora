@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="da" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historik — Revigora</title>
+  <meta name="robots" content="noindex">
+  <script src="../assets/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/app.css?v=4">
+</head>
+<body class="app-body no-js" data-page="historik">
+
+  <!-- Mockup notice: this app section is a static prototype — no auth, no real data. -->
+  <a class="skip-link" href="#main">Spring til indhold</a>
+
+  <header data-app-header></header>
+
+  <main class="app-main" id="main">
+    <div class="app-container app-stack app-stack--40">
+
+      <div class="page-header page-header--ruled">
+        <div class="page-header__copy">
+          <p class="eyebrow" data-hist-eyebrow></p>
+          <h1 class="page-header__title page-header__title--72">Historik</h1>
+        </div>
+        <div class="bio-trend" data-bio-trend></div>
+      </div>
+
+      <div class="test-cards" data-test-cards></div>
+
+      <section class="card compare" aria-labelledby="compare-title">
+        <div class="compare__head">
+          <h2 class="compare__title" id="compare-title">Sammenlign over tid</h2>
+          <div class="compare__toggle" role="group" aria-label="Vis markører">
+            <button type="button" class="mini-chip" data-compare-mode="key">Nøglemarkører</button>
+            <button type="button" class="mini-chip" data-compare-mode="all">Alle</button>
+          </div>
+        </div>
+        <div class="compare__scroll">
+          <table class="compare__table" data-compare></table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <nav data-app-tabbar></nav>
+
+  <script src="../assets/js/app-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
