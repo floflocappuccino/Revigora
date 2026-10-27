@@ -189,7 +189,7 @@
     var PACKAGES = {
       one_time: {
         img: 'assets/img/package-box-enkelt-tjek.png',
-        eyebrow: 'Engangstest',
+        eyebrow: 'Engangstest · 45 biomarkører',
         name: 'Revigora-test',
         desc: 'Én komplet blodprøve med svar i dit dashboard.',
         includes: ['Blodprøve på et offentligt hospital', 'Analyse på hospitalets laboratorium',
