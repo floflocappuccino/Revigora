@@ -10,6 +10,13 @@
   /* ---- 0 · Paste your Formspree form ID here (https://formspree.io) ------ */
   var FORM_ENDPOINT = 'https://formspree.io/f/mjyvvajr';
 
+  /* ---- 0b · Refundable deposit (Stripe Payment Link) ---------------------
+     Leave `url` empty and the deposit step is not shown anywhere. To go live:
+     paste the Payment Link (https://buy.stripe.com/...) and the amount as it
+     should read in Danish, e.g. '3.000 kr.'. In the Payment Link, set the
+     confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html */
+  var DEPOSIT = { url: '', amount: '' };
+
   var root = document.documentElement;
   root.classList.remove('no-js');
 
@@ -180,15 +187,16 @@
     if (!sheet || !backdrop) return;
 
     var PACKAGES = {
-      longevity: {
+      one_time: {
         img: 'assets/img/package-box-enkelt-tjek.png',
-        eyebrow: 'Engangstest · 45+ biomarkører',
-        name: 'Longevity & Healthspan',
-        desc: 'Til dig, der vil gå i dybden med biologisk alder og langsigtet sundhed.',
-        includes: ['ApoB & hs-CRP', 'Fasteinsulin', 'Biologisk alder-score', 'Thyroidea (stofskiftehormoner)'],
-        priceMeta: 'Engangstest',
-        price: '4.499 kr.',
-        ctaLabel: 'Kom på ventelisten – Longevity'
+        eyebrow: 'Engangstest',
+        name: 'Revigora-test',
+        desc: 'Én komplet blodprøve med svar i dit dashboard.',
+        includes: ['Blodprøve på et offentligt hospital', 'Analyse på hospitalets laboratorium',
+          'Resultater forklaret i et klart sprog', 'Gennemgået af en læge'],
+        priceMeta: 'Engangsbetaling',
+        price: 'Pris følger',
+        ctaLabel: 'Kom på ventelisten – Engangstest'
       }
     };
 
@@ -657,14 +665,45 @@
 
   function setupConfirmation() {
     if (confirmText) {
-      var text = 'Vi har sendt en bekræftelsesmail til ' + contact.email +
+      var text = 'Du er på listen med ' + contact.email +
         '. Du er blandt de første, der får adgang, når vi lancerer i Danmark.';
       if (consentInput && consentInput.checked) {
         text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
       }
       confirmText.textContent = text;
     }
+    setupDeposit();
     setupShare();
+  }
+
+  // Optional next step after the (free) waitlist: a refundable deposit via Stripe.
+  // Only shown when DEPOSIT is configured; the email is prefilled on Stripe's page and
+  // the ref hash ties the payment to this waitlist entry without exposing the email.
+  function setupDeposit() {
+    var done = steps[TOTAL_STEPS - 1];
+    var block = done.querySelector('[data-deposit]');
+    if (!DEPOSIT.url || !DEPOSIT.amount) { if (block) block.remove(); return; }
+    if (!block) {
+      block = document.createElement('div');
+      block.className = 'wl-deposit';
+      block.setAttribute('data-deposit', '');
+      block.innerHTML =
+        '<p class="wl-deposit__title">Vil du være sikker på en plads?</p>' +
+        '<p class="wl-deposit__text"></p>' +
+        '<a class="btn btn--primary btn--block" data-deposit-link></a>' +
+        '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" target="_blank" rel="noopener">betingelserne for depositum</a>.</p>';
+      done.insertBefore(block, done.querySelector('.modal__share'));
+    }
+    block.querySelector('.wl-deposit__text').textContent =
+      'Betal et depositum på ' + DEPOSIT.amount + '. Det trækkes fra prisen på din første test, ' +
+      'og du kan altid få det fuldt refunderet indtil lanceringen.';
+    var link = block.querySelector('[data-deposit-link]');
+    var url = DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
+      'prefilled_email=' + encodeURIComponent(contact.email) +
+      (refHash ? '&client_reference_id=' + encodeURIComponent(refHash) : '');
+    link.href = url;
+    link.textContent = 'Betal depositum (' + DEPOSIT.amount + ')';
+    link.onclick = function () { track('deposit_click', { intent: currentIntent }); };
   }
 
   function setupShare() {

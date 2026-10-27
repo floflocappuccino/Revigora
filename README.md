@@ -88,3 +88,21 @@ Copy was translated from the PRD's English. Worth a native pass:
 - `prefers-reduced-motion` disables reveal + readout animation.
 - No render-blocking images; placeholder art is inline-styled SVG. LCP element is the
   hero `<h1>` text.
+
+## Refundable deposit (V1)
+
+After someone joins the waitlist, the confirmation step can offer a refundable deposit via a
+**Stripe Payment Link**. It is **off** until configured; nothing deposit-related shows on the site.
+
+To switch it on:
+1. In Stripe, create a Payment Link: product "Depositum – Revigora", the amount, collect name + e-mail
+   (+ phone), require acceptance of the terms (link to `https://revigora.dk/handelsbetingelser.html#depositum`),
+   receipts on, and after payment redirect to `https://revigora.dk/tak.html`.
+2. In `assets/js/main.js`, set `DEPOSIT = { url: 'https://buy.stripe.com/…', amount: '3.000 kr.' }`
+   and bump `main.js?v=` on the pages.
+
+The link prefills the visitor's e-mail and sends the waitlist ref hash as `client_reference_id`, so a payment
+in Stripe can be matched to its waitlist entry.
+
+Legal pages: `privatliv.html`, `handelsbetingelser.html` (deposit terms), `cookies.html`, `tak.html`.
+Placeholders still to fill are highlighted in yellow (`.legal__todo`).

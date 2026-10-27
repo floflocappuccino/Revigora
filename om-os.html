@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/css/styles.css?v=9">
+  <link rel="stylesheet" href="assets/css/styles.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#main">Gå til indhold</a>
@@ -35,7 +35,6 @@
         <a href="blog.html">Blog</a>
       </nav>
       <div class="site-header__actions">
-        <a class="site-header__login" href="app/login.html">Log ind</a>
         <button type="button" class="btn btn--primary btn--sm" data-open-waitlist data-intent="">
           <span class="btn__full">Reservér adgang</span>
           <span class="btn__compact">Reservér</span>
@@ -83,12 +82,12 @@
         <article class="principle reveal">
           <p class="principle__num">02</p>
           <h3 class="principle__title">Klinisk kvalitet, hver gang</h3>
-          <p class="principle__body">Alle prøver analyseres på ISO 15189-certificerede danske laboratorier. Ingen genveje på målingerne.</p>
+          <p class="principle__body">Alle prøver analyseres på offentlige danske hospitalslaboratorier, de samme som sundhedsvæsenet selv bruger. Og en læge gennemgår dine svar, før du ser dem.</p>
         </article>
         <article class="principle reveal">
           <p class="principle__num">03</p>
           <h3 class="principle__title">Data, du kan handle på</h3>
-          <p class="principle__body">Et tal er kun nyttigt, hvis det fører til noget. Derfor får du konkrete tiltag, ikke bare intervaller.</p>
+          <p class="principle__body">Et tal er kun nyttigt, hvis du forstår, hvad det betyder for dig. Derfor får du en forklaring og et klart næste skridt, fx hvornår det giver mening at teste igen.</p>
         </article>
       </div>
     </section>
@@ -112,20 +111,20 @@
       <div class="container">
         <div class="stats reveal">
           <div class="stats__item">
-            <p class="stats__num">50+</p>
-            <p class="stats__label">partnerklinikker i Danmark</p>
+            <p class="stats__num">1</p>
+            <p class="stats__label">samlet blodprøve</p>
           </div>
           <div class="stats__item">
-            <p class="stats__num">45+</p>
-            <p class="stats__label">biomarkører i det fulde panel</p>
+            <p class="stats__num">Læge</p>
+            <p class="stats__label">gennemgår dine svar</p>
           </div>
           <div class="stats__item">
-            <p class="stats__num">3–5</p>
-            <p class="stats__label">hverdage til dine resultater</p>
+            <p class="stats__num">DK</p>
+            <p class="stats__label">offentlige hospitalslaboratorier</p>
           </div>
           <div class="stats__item">
-            <p class="stats__num">ISO</p>
-            <p class="stats__label">15189-certificerede laboratorier</p>
+            <p class="stats__num">Over tid</p>
+            <p class="stats__label">følg din udvikling med medlemskab</p>
           </div>
         </div>
       </div>
@@ -166,15 +165,13 @@
 
           <nav class="site-footer__col" aria-label="Juridisk">
             <h2 class="site-footer__heading">Juridisk</h2>
-            <a href="#">Privatliv</a>
-            <a href="#">Handelsbetingelser</a>
-            <a href="#">Cookies</a>
-            <a href="app/login.html" class="site-footer__mobile-only">Log ind</a>
+            <a href="privatliv.html">Privatliv</a>
+            <a href="handelsbetingelser.html">Handelsbetingelser</a>
+            <a href="cookies.html">Cookies</a>
           </nav>
 
-          <nav class="site-footer__col site-footer__desktop-only" aria-label="Konto">
-            <h2 class="site-footer__heading">Konto</h2>
-            <a href="app/login.html">Log ind</a>
+          <nav class="site-footer__col site-footer__desktop-only" aria-label="Venteliste">
+            <h2 class="site-footer__heading">Venteliste</h2>
             <button type="button" class="linklike" data-open-waitlist data-intent="">Kom på ventelisten</button>
           </nav>
         </div>
@@ -221,7 +218,7 @@
           <div class="field field--checkbox">
             <label class="checkbox">
               <input type="checkbox" id="wl-consent" name="marketing_consent">
-              <span>Ja tak, send mig nyheder og tilbud fra Revigora frem mod lanceringen. Læs vores <a href="/privatlivspolitik" target="_blank" rel="noopener">privatlivspolitik</a>.</span>
+              <span>Ja tak, send mig nyheder og tilbud fra Revigora frem mod lanceringen. Læs vores <a href="privatliv.html" target="_blank" rel="noopener">privatlivspolitik</a>.</span>
             </label>
           </div>
           <button type="submit" class="btn btn--primary btn--block" data-submit>Sikr min plads</button>
@@ -278,6 +275,6 @@
     </div>
   </div>
 
-  <script src="assets/js/main.js?v=8" defer></script>
+  <script src="assets/js/main.js?v=9" defer></script>
 </body>
 </html>

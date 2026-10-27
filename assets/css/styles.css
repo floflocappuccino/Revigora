@@ -1459,3 +1459,23 @@ button { font-family: inherit; color: inherit; }
 .read-next__head a { font-size: .875rem; font-weight: 600; color: var(--color-text-primary); }
 .read-next-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 16px; }
 @media (min-width: 768px) { .read-next-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+
+/* =========================================================================
+   V1: refundable deposit step (waitlist confirmation) + legal pages
+   ========================================================================= */
+.wl-deposit {
+  display: grid; gap: 10px; padding: 18px; margin: 4px 0 6px;
+  border: 1px solid var(--color-hairline); border-radius: var(--radius-card);
+  background: var(--color-paper);
+}
+.wl-deposit__title { margin: 0; font-family: var(--font-display); font-size: 1.375rem; line-height: 1.2; color: var(--color-text-primary); }
+.wl-deposit__text { margin: 0; font-size: .9375rem; line-height: 1.6; color: var(--color-body-dim); }
+.wl-deposit__terms { margin: 0; font-size: .8125rem; line-height: 1.5; color: var(--color-label); }
+.wl-deposit__terms a { color: inherit; text-decoration: underline; }
+
+.legal h2 { margin-top: 40px; }
+.legal p, .legal li { color: var(--color-body-dim); }
+.legal ul { padding-left: 1.2em; }
+.legal li + li { margin-top: 6px; }
+.legal__updated { font-size: .875rem; color: var(--color-label); }
+.legal__todo { background: #FFF3C4; padding: 0 .25em; border-radius: 3px; }
