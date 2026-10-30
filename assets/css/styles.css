@@ -444,7 +444,7 @@ button { font-family: inherit; color: inherit; }
   inset: 0;
   z-index: 0;
 }
-.hero__media img { width: 100%; height: 100%; object-fit: cover; }
+.hero__media img { width: 100%; height: 100%; object-fit: cover; object-position: 85% 50%; } /* mobile: keep the badebro hut in frame */
 .hero__scrim {
   position: absolute;
   inset: 0;
@@ -536,6 +536,7 @@ button { font-family: inherit; color: inherit; }
 
 @media (min-width: 768px) {
   .hero { padding-top: 96px; }
+  .hero__media img { object-position: 50% 50%; }
   .hero__scrim {
     background-image:
       linear-gradient(90deg,
