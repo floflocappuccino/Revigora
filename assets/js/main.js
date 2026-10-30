@@ -15,7 +15,7 @@
      paste the Payment Link (https://buy.stripe.com/...) and the amount as it
      should read in Danish, e.g. '3.000 kr.'. In the Payment Link, set the
      confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html */
-  var DEPOSIT = { url: '', amount: '' };
+  var DEPOSIT = { url: '', amount: '3.500 kr.' };
 
   var root = document.documentElement;
   root.classList.remove('no-js');
