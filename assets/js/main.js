@@ -12,10 +12,18 @@
 
   /* ---- 0b · Refundable deposit (Stripe Payment Link) ---------------------
      Leave `url` empty and the deposit step is not shown anywhere. To go live:
-     paste the Payment Link (https://buy.stripe.com/...) and the amount as it
-     should read in Danish, e.g. '3.000 kr.'. In the Payment Link, set the
-     confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html */
-  var DEPOSIT = { url: '', amount: '3.500 kr.' };
+     paste the Payment Link (https://buy.stripe.com/...); the amount (kr.) is
+     already set and must match the Payment Link. In the Payment Link, set the
+     confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html
+     With `url` empty the last step is the free waitlist confirmation instead. */
+  var DEPOSIT = { url: '', amount: 3500 };   // kr. incl. VAT
+
+  /* ---- 0c · Referral discount --------------------------------------------
+     Everyone gets a personal link (?ref=…). Each person who signs up through it
+     gives the referrer `discount` kr. off at launch; it stacks. Terms:
+     handelsbetingelser.html#henvisning. Counting is done from the waitlist
+     entries' `ref` field (Formspree). */
+  var REFERRAL = { discount: 100, exampleCount: 5 };
 
   var root = document.documentElement;
   root.classList.remove('no-js');
@@ -661,50 +669,79 @@
     showStep(2);
   });
 
-  /* ---- step 5 · confirmation + share ------------------------------------ */
+  /* ---- step 5 · secure your place (deposit) + referral + share ----------- */
   var SHARE_TEXT = 'Jeg er kommet på ventelisten til Revigora — proaktiv sundhedstestning for Norden.';
 
+  function kr(n) { return n.toLocaleString('da-DK') + ' kr.'; }
+
+  // With a Payment Link configured, the last step is where people secure their place by
+  // paying. Without one, it is the free waitlist confirmation. The referral offer is in both.
   function setupConfirmation() {
+    var done = steps[TOTAL_STEPS - 1];
+    var payOn = !!(DEPOSIT.url && DEPOSIT.amount);
+    done.querySelector('.modal__title').textContent = payOn ? 'Sikr din plads' : 'Du er på ventelisten';
+    var closeBtn = done.querySelector('.btn--ghost[data-close-waitlist]');
+    if (closeBtn) closeBtn.textContent = payOn ? 'Ikke nu' : 'Luk';
     if (confirmText) {
-      var text = 'Du er på listen med ' + contact.email +
-        '. Du er blandt de første, der får adgang, når vi lancerer i Danmark.';
+      var text = payOn
+        ? 'Du er skrevet op med ' + contact.email + '. Betal et depositum på ' + kr(DEPOSIT.amount) +
+          ' for at sikre din plads blandt de første, når vi lancerer i Danmark.'
+        : 'Du er på listen med ' + contact.email + '. Du er blandt de første, der får adgang, når vi lancerer i Danmark.';
       if (consentInput && consentInput.checked) {
         text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
       }
       confirmText.textContent = text;
     }
-    setupDeposit();
+    setupDeposit(done, payOn);
+    setupReferral(done, payOn);
     setupShare();
   }
 
-  // Optional next step after the (free) waitlist: a refundable deposit via Stripe.
-  // Only shown when DEPOSIT is configured; the email is prefilled on Stripe's page and
-  // the ref hash ties the payment to this waitlist entry without exposing the email.
-  function setupDeposit() {
-    var done = steps[TOTAL_STEPS - 1];
+  // The payment button. The email is prefilled on Stripe's page and the ref hash ties the
+  // payment to this waitlist entry without exposing the email.
+  function setupDeposit(done, payOn) {
     var block = done.querySelector('[data-deposit]');
-    if (!DEPOSIT.url || !DEPOSIT.amount) { if (block) block.remove(); return; }
+    if (!payOn) { if (block) block.remove(); return; }
     if (!block) {
       block = document.createElement('div');
       block.className = 'wl-deposit';
       block.setAttribute('data-deposit', '');
       block.innerHTML =
-        '<p class="wl-deposit__title">Vil du være sikker på en plads?</p>' +
-        '<p class="wl-deposit__text"></p>' +
         '<a class="btn btn--primary btn--block" data-deposit-link></a>' +
-        '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" target="_blank" rel="noopener">betingelserne for depositum</a>.</p>';
-      done.insertBefore(block, done.querySelector('.modal__share'));
+        '<p class="wl-deposit__text">Depositummet trækkes fra prisen på din første test, og du kan altid få det ' +
+          'fuldt refunderet, indtil du bestiller.</p>' +
+        '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" ' +
+          'target="_blank" rel="noopener">betingelserne for depositum</a>.</p>';
+      confirmText.insertAdjacentElement('afterend', block);
     }
-    block.querySelector('.wl-deposit__text').textContent =
-      'Betal et depositum på ' + DEPOSIT.amount + '. Det trækkes fra prisen på din første test, ' +
-      'og du kan altid få det fuldt refunderet indtil lanceringen.';
     var link = block.querySelector('[data-deposit-link]');
-    var url = DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
+    link.href = DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
       'prefilled_email=' + encodeURIComponent(contact.email) +
       (refHash ? '&client_reference_id=' + encodeURIComponent(refHash) : '');
-    link.href = url;
-    link.textContent = 'Betal depositum (' + DEPOSIT.amount + ')';
+    link.textContent = 'Sikr din plads · ' + kr(DEPOSIT.amount);
     link.onclick = function () { track('deposit_click', { intent: currentIntent }); };
+  }
+
+  // Stackable referral discount, shown above the share buttons (which share the personal link).
+  function setupReferral(done, payOn) {
+    var block = done.querySelector('[data-referral]');
+    if (!block) {
+      block = document.createElement('div');
+      block.className = 'wl-referral';
+      block.setAttribute('data-referral', '');
+      block.innerHTML =
+        '<p class="wl-referral__title"></p><p class="wl-referral__text"></p>' +
+        '<p class="wl-referral__terms"><a href="/handelsbetingelser.html#henvisning" target="_blank" rel="noopener">' +
+          'Betingelser for henvisningsrabat</a></p>';
+      done.insertBefore(block, done.querySelector('.modal__share'));
+    }
+    var d = REFERRAL.discount, n = REFERRAL.exampleCount;
+    block.querySelector('.wl-referral__title').textContent = 'Få ' + kr(d) + ' i rabat for hver, du henviser';
+    block.querySelector('.wl-referral__text').textContent =
+      'Del dit personlige link. Hver gang en person skriver sig op via det, får du ' + kr(d) +
+      ' i rabat ved lancering, og rabatterne lægges sammen. Henviser du fx ' + n + ' personer, ' +
+      (payOn ? 'falder din pris fra ' + kr(DEPOSIT.amount) + ' til ' + kr(DEPOSIT.amount - n * d)
+             : 'sparer du ' + kr(n * d));  // "kr." already ends the sentence
   }
 
   function setupShare() {

@@ -1479,3 +1479,14 @@ button { font-family: inherit; color: inherit; }
 .legal li + li { margin-top: 6px; }
 .legal__updated { font-size: .875rem; color: var(--color-label); }
 .legal__todo { background: #FFF3C4; padding: 0 .25em; border-radius: 3px; }
+
+/* Signup last step: referral discount (shown with or without the deposit) */
+.wl-referral {
+  display: grid; gap: 6px; padding: 16px 18px; margin: 2px 0;
+  border: 1px dashed var(--color-mint-leaf); border-radius: var(--radius-card);
+  background: var(--color-zone);
+}
+.wl-referral__title { margin: 0; font-weight: 600; font-size: .9375rem; color: var(--color-mint-ink); }
+.wl-referral__text { margin: 0; font-size: .875rem; line-height: 1.55; color: var(--color-body-dim); }
+.wl-referral__terms { margin: 0; font-size: .8125rem; }
+.wl-referral__terms a { color: var(--color-label); text-decoration: underline; }

@@ -98,11 +98,24 @@ To switch it on:
 1. In Stripe, create a Payment Link: product "Depositum – Revigora", the amount, collect name + e-mail
    (+ phone), require acceptance of the terms (link to `https://revigora.dk/handelsbetingelser.html#depositum`),
    receipts on, and after payment redirect to `https://revigora.dk/tak.html`.
-2. In `assets/js/main.js`, set `DEPOSIT = { url: 'https://buy.stripe.com/…', amount: '3.000 kr.' }`
-   and bump `main.js?v=` on the pages.
+2. In `assets/js/main.js`, set `DEPOSIT.url` to the Payment Link (`amount: 3500` is already set and must
+   match the Payment Link), then bump `main.js?v=` on the pages.
+
+With the link set, the waitlist's last step becomes **"Sikr din plads"**: the pay button, the referral offer
+and "Ikke nu". Without it, the last step is the free waitlist confirmation (still with the referral offer).
 
 The link prefills the visitor's e-mail and sends the waitlist ref hash as `client_reference_id`, so a payment
 in Stripe can be matched to its waitlist entry.
 
 Legal pages: `privatliv.html`, `handelsbetingelser.html` (deposit terms), `cookies.html`, `tak.html`.
 Placeholders still to fill are highlighted in yellow (`.legal__todo`).
+
+## Referral discount
+
+Every sign-up gets a personal link (`?ref=` + the first 8 characters of a hash of their e-mail; the e-mail
+itself is never in the link). Each new person who joins the waitlist through it gives the referrer 100 kr.
+off at launch, stacking (`REFERRAL` in `assets/js/main.js`; terms in `handelsbetingelser.html#henvisning`).
+
+Counting is manual for now: in the Formspree export, each entry's `ref` field is the code of whoever referred
+it. To find someone's own code, hash their e-mail (SHA-256 of the trimmed, lower-cased address) and take the
+first 8 hex characters. Stripe payments carry the same code as `client_reference_id`.
