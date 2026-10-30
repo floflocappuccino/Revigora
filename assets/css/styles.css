@@ -279,7 +279,16 @@ button { font-family: inherit; color: inherit; }
 .marketing-nav__logo--dark { display: none; }
 
 .marketing-nav__links { display: none; }
-.marketing-nav__login { display: none; }
+/* "Log ind" in the header on phones too (it also stays in the menu and the footer). */
+.marketing-nav__login {
+  display: inline-block;
+  font-size: .875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, .85);
+}
+.marketing-nav.is-scrolled .marketing-nav__login { color: var(--color-text-primary); }
 
 .marketing-nav__actions { display: flex; align-items: center; gap: 8px; }
 .marketing-nav__cta {
