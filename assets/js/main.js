@@ -17,7 +17,8 @@
      confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html
      With `url` empty the payment step is still shown, but the button is locked
      ("Betaling åbner snart"). Pasting the link is all it takes to open it. */
-  var DEPOSIT = { url: '', amount: 3500 };   // kr. incl. VAT = the full price of the first test
+  var DEPOSIT = { url: '', amount: 3500, normal: 4000 };  // kr. incl. VAT: first membership test at the
+                                                       // pre-launch price (normally 4.000 kr. per test)
 
   /* ---- 0c · Referral discount --------------------------------------------
      Everyone gets a personal link (?ref=…). A referral counts only when both the
@@ -205,7 +206,7 @@
         includes: ['Blodprøve på et offentligt hospital', 'Analyse på hospitalets laboratorium',
           'Resultater forklaret i et klart sprog', 'Gennemgået af en læge'],
         priceMeta: 'Engangsbetaling',
-        price: '3.500 kr.',
+        price: '5.000 kr.',
         ctaLabel: 'Kom på ventelisten – Engangstest'
       }
     };
@@ -688,10 +689,10 @@
     if (closeBtn) closeBtn.textContent = payOpen ? 'Ikke nu' : 'Luk';
     if (confirmText) {
       var text = payOpen
-        ? 'Du er skrevet op med ' + contact.email + '. Betal ' + kr(DEPOSIT.amount) +
-          ' nu for at sikre din plads blandt de første, når vi lancerer i Danmark.'
-        : 'Du er skrevet op med ' + contact.email + ' og står på ventelisten. Snart kan du sikre din plads ' +
-          'blandt de første ved at betale ' + kr(DEPOSIT.amount) + ' på forhånd.'
+        ? 'Du er skrevet op med ' + contact.email + '. Sikr dig et medlemskab til introduktionspris: ' +
+          'din første test for ' + kr(DEPOSIT.amount) + ' i stedet for ' + kr(DEPOSIT.normal)
+        : 'Du er skrevet op med ' + contact.email + ' og står på ventelisten. Snart kan du sikre dig et ' +
+          'medlemskab til introduktionspris: din første test for ' + kr(DEPOSIT.amount) + ' i stedet for ' + kr(DEPOSIT.normal)
       if (consentInput && consentInput.checked) {
         text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
       }
@@ -713,12 +714,14 @@
       block.innerHTML =
         '<a class="btn btn--primary btn--block" data-deposit-link></a>' +
         '<p class="wl-deposit__soon" data-deposit-soon>Betaling åbner snart. Vi giver dig besked, når du kan sikre din plads.</p>' +
-        '<p class="wl-deposit__text">Beløbet dækker hele prisen for din første test, så du skal ikke betale mere ' +
-          'ved lancering. Du kan altid få det fuldt refunderet, indtil du bestiller.</p>' +
+        '<p class="wl-deposit__text"></p>' +
         '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" ' +
           'target="_blank" rel="noopener">betingelserne for depositum</a>.</p>';
       confirmText.insertAdjacentElement('afterend', block);
     }
+    block.querySelector('.wl-deposit__text').textContent =
+      'Beløbet dækker hele din første test som medlem, så du skal ikke betale mere ved lancering. Derefter koster ' +
+      'hver test ' + kr(DEPOSIT.normal) + ' Du kan altid få beløbet fuldt refunderet, indtil du bestiller.';
     var link = block.querySelector('[data-deposit-link]');
     link.textContent = 'Sikr din plads · ' + kr(DEPOSIT.amount);
     block.querySelector('[data-deposit-soon]').hidden = payOpen;
@@ -764,7 +767,7 @@
     block.querySelector('.wl-referral__text').textContent =
       'Når du har sikret din plads, kan du dele dit personlige link. For hver person, der sikrer sin plads via ' +
       'det, får du ' + kr(d) + ' tilbage ved lancering, og beløbene lægges sammen. Henviser du fx ' + n +
-      ' personer, koster din test kun ' + kr(DEPOSIT.amount - n * d);  // "kr." ends the sentence
+      ' personer, koster din første test kun ' + kr(DEPOSIT.amount - n * d);  // "kr." ends the sentence
   }
 
   function setupShare() {
