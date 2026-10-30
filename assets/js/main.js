@@ -15,7 +15,8 @@
      paste the Payment Link (https://buy.stripe.com/...); the amount (kr.) is
      already set and must match the Payment Link. In the Payment Link, set the
      confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html
-     With `url` empty the last step is the free waitlist confirmation instead. */
+     With `url` empty the payment step is still shown, but the button is locked
+     ("Betaling åbner snart"). Pasting the link is all it takes to open it. */
   var DEPOSIT = { url: '', amount: 3500 };   // kr. incl. VAT
 
   /* ---- 0c · Referral discount --------------------------------------------
@@ -674,40 +675,41 @@
 
   function kr(n) { return n.toLocaleString('da-DK') + ' kr.'; }
 
-  // With a Payment Link configured, the last step is where people secure their place by
-  // paying. Without one, it is the free waitlist confirmation. The referral offer is in both.
+  // The last step is where people secure their place by paying. Until a Payment Link is set,
+  // the button is shown but locked; the free waitlist sign-up has already been saved either way.
   function setupConfirmation() {
     var done = steps[TOTAL_STEPS - 1];
-    var payOn = !!(DEPOSIT.url && DEPOSIT.amount);
-    done.querySelector('.modal__title').textContent = payOn ? 'Sikr din plads' : 'Du er på ventelisten';
+    var payOpen = !!DEPOSIT.url;
+    done.querySelector('.modal__title').textContent = 'Sikr din plads';
     var closeBtn = done.querySelector('.btn--ghost[data-close-waitlist]');
-    if (closeBtn) closeBtn.textContent = payOn ? 'Ikke nu' : 'Luk';
+    if (closeBtn) closeBtn.textContent = payOpen ? 'Ikke nu' : 'Luk';
     if (confirmText) {
-      var text = payOn
+      var text = payOpen
         ? 'Du er skrevet op med ' + contact.email + '. Betal et depositum på ' + kr(DEPOSIT.amount) +
           ' for at sikre din plads blandt de første, når vi lancerer i Danmark.'
-        : 'Du er på listen med ' + contact.email + '. Du er blandt de første, der får adgang, når vi lancerer i Danmark.';
+        : 'Du er skrevet op med ' + contact.email + ' og står på ventelisten. Snart kan du sikre din plads ' +
+          'blandt de første med et depositum på ' + kr(DEPOSIT.amount);  // "kr." ends the sentence
       if (consentInput && consentInput.checked) {
         text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
       }
       confirmText.textContent = text;
     }
-    setupDeposit(done, payOn);
-    setupReferral(done, payOn);
+    setupDeposit(done, payOpen);
+    setupReferral(done);
     setupShare();
   }
 
   // The payment button. The email is prefilled on Stripe's page and the ref hash ties the
   // payment to this waitlist entry without exposing the email.
-  function setupDeposit(done, payOn) {
+  function setupDeposit(done, payOpen) {
     var block = done.querySelector('[data-deposit]');
-    if (!payOn) { if (block) block.remove(); return; }
     if (!block) {
       block = document.createElement('div');
       block.className = 'wl-deposit';
       block.setAttribute('data-deposit', '');
       block.innerHTML =
         '<a class="btn btn--primary btn--block" data-deposit-link></a>' +
+        '<p class="wl-deposit__soon" data-deposit-soon>Betaling åbner snart. Vi giver dig besked, når du kan sikre din plads.</p>' +
         '<p class="wl-deposit__text">Depositummet trækkes fra prisen på din første test, og du kan altid få det ' +
           'fuldt refunderet, indtil du bestiller.</p>' +
         '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" ' +
@@ -715,15 +717,26 @@
       confirmText.insertAdjacentElement('afterend', block);
     }
     var link = block.querySelector('[data-deposit-link]');
+    link.textContent = 'Sikr din plads · ' + kr(DEPOSIT.amount);
+    block.querySelector('[data-deposit-soon]').hidden = payOpen;
+    if (!payOpen) {
+      // Locked until the Stripe Payment Link exists.
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      link.classList.add('is-disabled');
+      link.onclick = function (e) { e.preventDefault(); };
+      return;
+    }
+    link.removeAttribute('aria-disabled');
+    link.classList.remove('is-disabled');
     link.href = DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
       'prefilled_email=' + encodeURIComponent(contact.email) +
       (refHash ? '&client_reference_id=' + encodeURIComponent(refHash) : '');
-    link.textContent = 'Sikr din plads · ' + kr(DEPOSIT.amount);
     link.onclick = function () { track('deposit_click', { intent: currentIntent }); };
   }
 
   // Stackable referral discount, shown above the share buttons (which share the personal link).
-  function setupReferral(done, payOn) {
+  function setupReferral(done) {
     var block = done.querySelector('[data-referral]');
     if (!block) {
       block = document.createElement('div');
@@ -740,8 +753,7 @@
     block.querySelector('.wl-referral__text').textContent =
       'Del dit personlige link. Hver gang en person skriver sig op via det, får du ' + kr(d) +
       ' i rabat ved lancering, og rabatterne lægges sammen. Henviser du fx ' + n + ' personer, ' +
-      (payOn ? 'falder din pris fra ' + kr(DEPOSIT.amount) + ' til ' + kr(DEPOSIT.amount - n * d)
-             : 'sparer du ' + kr(n * d));  // "kr." already ends the sentence
+      'falder din pris fra ' + kr(DEPOSIT.amount) + ' til ' + kr(DEPOSIT.amount - n * d);  // "kr." ends the sentence
   }
 
   function setupShare() {

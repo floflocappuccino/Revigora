@@ -1490,3 +1490,7 @@ button { font-family: inherit; color: inherit; }
 .wl-referral__text { margin: 0; font-size: .875rem; line-height: 1.55; color: var(--color-body-dim); }
 .wl-referral__terms { margin: 0; font-size: .8125rem; }
 .wl-referral__terms a { color: var(--color-label); text-decoration: underline; }
+
+/* Pay button locked until the Stripe Payment Link is set */
+.wl-deposit .btn.is-disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+.wl-deposit__soon { margin: 0; font-size: .875rem; font-weight: 500; color: var(--color-mint-ink); }

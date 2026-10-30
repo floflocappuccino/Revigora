@@ -101,8 +101,9 @@ To switch it on:
 2. In `assets/js/main.js`, set `DEPOSIT.url` to the Payment Link (`amount: 3500` is already set and must
    match the Payment Link), then bump `main.js?v=` on the pages.
 
-With the link set, the waitlist's last step becomes **"Sikr din plads"**: the pay button, the referral offer
-and "Ikke nu". Without it, the last step is the free waitlist confirmation (still with the referral offer).
+The waitlist's last step is always **"Sikr din plads"** (pay button, referral offer, share buttons). Without
+the link the pay button is shown but locked, with "Betaling åbner snart"; with it, the button opens Stripe and
+the close button reads "Ikke nu".
 
 The link prefills the visitor's e-mail and sends the waitlist ref hash as `client_reference_id`, so a payment
 in Stripe can be matched to its waitlist entry.
