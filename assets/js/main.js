@@ -515,7 +515,8 @@
 
   /* ---- triggers -------------------------------------------------------- */
   document.querySelectorAll('[data-open-waitlist]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+      if (btn.tagName === 'A') e.preventDefault(); // "Log ind" links: open the waitlist instead
       openModal(btn.getAttribute('data-intent') || '', btn);
     });
   });
