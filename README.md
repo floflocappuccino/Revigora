@@ -113,10 +113,16 @@ Placeholders still to fill are highlighted in yellow (`.legal__todo`).
 
 ## Referral discount
 
-Every sign-up gets a personal link (`?ref=` + the first 8 characters of a hash of their e-mail; the e-mail
-itself is never in the link). Each new person who joins the waitlist through it gives the referrer 100 kr.
-off at launch, stacking (`REFERRAL` in `assets/js/main.js`; terms in `handelsbetingelser.html#henvisning`).
+Every sign-up gets a personal link (`?ref=` + the first 8 characters of a SHA-256 hash of their trimmed,
+lower-cased e-mail; the e-mail itself is never in the link). A referral **counts only when both the referrer
+and the referred person have paid** the deposit (and neither has been refunded). Each counted referral gives
+the referrer 100 kr. back at launch, stacking (`REFERRAL` in `assets/js/main.js`; terms in
+`handelsbetingelser.html#henvisning`).
 
-Counting is manual for now: in the Formspree export, each entry's `ref` field is the code of whoever referred
-it. To find someone's own code, hash their e-mail (SHA-256 of the trimmed, lower-cased address) and take the
-first 8 hex characters. Stripe payments carry the same code as `client_reference_id`.
+**Counting from Stripe alone:** each payment's `client_reference_id` is `<own code>_<referrer code>` (or just
+`<own code>` if they weren't referred). In Stripe's payment export:
+1. Keep only successful, non-refunded payments.
+2. The set of paying codes = the part before `_`.
+3. For each paying code X, its referrals = payments whose part after `_` is X.
+
+Formspree's `ref` field still shows who referred each free sign-up, but only paid ones count.

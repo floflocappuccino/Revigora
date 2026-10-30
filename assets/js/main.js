@@ -17,13 +17,14 @@
      confirmation page to https://revigora.dk/tak.html. Terms: handelsbetingelser.html
      With `url` empty the payment step is still shown, but the button is locked
      ("Betaling åbner snart"). Pasting the link is all it takes to open it. */
-  var DEPOSIT = { url: '', amount: 3500 };   // kr. incl. VAT
+  var DEPOSIT = { url: '', amount: 3500 };   // kr. incl. VAT = the full price of the first test
 
   /* ---- 0c · Referral discount --------------------------------------------
-     Everyone gets a personal link (?ref=…). Each person who signs up through it
-     gives the referrer `discount` kr. off at launch; it stacks. Terms:
-     handelsbetingelser.html#henvisning. Counting is done from the waitlist
-     entries' `ref` field (Formspree). */
+     Everyone gets a personal link (?ref=…). A referral counts only when both the
+     referrer and the referred person have paid the deposit; each gives the
+     referrer `discount` kr. back at launch, and it stacks. Terms:
+     handelsbetingelser.html#henvisning. Counting: Stripe's client_reference_id is
+     "<own code>_<referrer code>" (see README). */
   var REFERRAL = { discount: 100, exampleCount: 5 };
 
   var root = document.documentElement;
@@ -204,7 +205,7 @@
         includes: ['Blodprøve på et offentligt hospital', 'Analyse på hospitalets laboratorium',
           'Resultater forklaret i et klart sprog', 'Gennemgået af en læge'],
         priceMeta: 'Engangsbetaling',
-        price: 'Pris følger',
+        price: '3.500 kr.',
         ctaLabel: 'Kom på ventelisten – Engangstest'
       }
     };
@@ -356,8 +357,10 @@
   var submissionSent = false; // set once the single Formspree POST has gone out
   var refHash = '';
   var refParam = (function () {
-    try { return new URLSearchParams(window.location.search).get('ref') || ''; }
-    catch (e) { return ''; }
+    try {
+      var r = (new URLSearchParams(window.location.search).get('ref') || '').toLowerCase();
+      return /^[0-9a-f]{8}$/.test(r) ? r : '';  // only well-formed codes (they end up in Stripe)
+    } catch (e) { return ''; }
   })();
 
   var contact = { name: '', email: '', city: '', consent: false, consentTimestamp: '' };
@@ -685,10 +688,10 @@
     if (closeBtn) closeBtn.textContent = payOpen ? 'Ikke nu' : 'Luk';
     if (confirmText) {
       var text = payOpen
-        ? 'Du er skrevet op med ' + contact.email + '. Betal et depositum på ' + kr(DEPOSIT.amount) +
-          ' for at sikre din plads blandt de første, når vi lancerer i Danmark.'
+        ? 'Du er skrevet op med ' + contact.email + '. Betal ' + kr(DEPOSIT.amount) +
+          ' nu for at sikre din plads blandt de første, når vi lancerer i Danmark.'
         : 'Du er skrevet op med ' + contact.email + ' og står på ventelisten. Snart kan du sikre din plads ' +
-          'blandt de første med et depositum på ' + kr(DEPOSIT.amount);  // "kr." ends the sentence
+          'blandt de første ved at betale ' + kr(DEPOSIT.amount) + ' på forhånd.'
       if (consentInput && consentInput.checked) {
         text += ' Indtil da sender vi dig lidt viden om blodprøver og sundhed undervejs.';
       }
@@ -710,8 +713,8 @@
       block.innerHTML =
         '<a class="btn btn--primary btn--block" data-deposit-link></a>' +
         '<p class="wl-deposit__soon" data-deposit-soon>Betaling åbner snart. Vi giver dig besked, når du kan sikre din plads.</p>' +
-        '<p class="wl-deposit__text">Depositummet trækkes fra prisen på din første test, og du kan altid få det ' +
-          'fuldt refunderet, indtil du bestiller.</p>' +
+        '<p class="wl-deposit__text">Beløbet dækker hele prisen for din første test, så du skal ikke betale mere ' +
+          'ved lancering. Du kan altid få det fuldt refunderet, indtil du bestiller.</p>' +
         '<p class="wl-deposit__terms">Betaling sker sikkert via Stripe. Læs <a href="/handelsbetingelser.html#depositum" ' +
           'target="_blank" rel="noopener">betingelserne for depositum</a>.</p>';
       confirmText.insertAdjacentElement('afterend', block);
@@ -729,10 +732,18 @@
     }
     link.removeAttribute('aria-disabled');
     link.classList.remove('is-disabled');
-    link.href = DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
+    link.href = depositUrl();
+    // Rebuilt on click too: the personal code is hashed in the background after step 1 and
+    // may not have been ready when this step was drawn. Referral payouts depend on it.
+    link.onclick = function () { link.href = depositUrl(); track('deposit_click', { intent: currentIntent }); };
+  }
+
+  // Stripe gets "<own code>_<referrer code>" so referrals can be counted from Stripe alone.
+  function depositUrl() {
+    var ref = refHash ? refHash + (refParam && refParam !== refHash ? '_' + refParam : '') : '';
+    return DEPOSIT.url + (DEPOSIT.url.indexOf('?') > -1 ? '&' : '?') +
       'prefilled_email=' + encodeURIComponent(contact.email) +
-      (refHash ? '&client_reference_id=' + encodeURIComponent(refHash) : '');
-    link.onclick = function () { track('deposit_click', { intent: currentIntent }); };
+      (ref ? '&client_reference_id=' + encodeURIComponent(ref) : '');
   }
 
   // Stackable referral discount, shown above the share buttons (which share the personal link).
@@ -749,19 +760,19 @@
       done.insertBefore(block, done.querySelector('.modal__share'));
     }
     var d = REFERRAL.discount, n = REFERRAL.exampleCount;
-    block.querySelector('.wl-referral__title').textContent = 'Få ' + kr(d) + ' i rabat for hver, du henviser';
+    block.querySelector('.wl-referral__title').textContent = 'Få ' + kr(d) + ' tilbage for hver, du henviser';
     block.querySelector('.wl-referral__text').textContent =
-      'Del dit personlige link. Hver gang en person skriver sig op via det, får du ' + kr(d) +
-      ' i rabat ved lancering, og rabatterne lægges sammen. Henviser du fx ' + n + ' personer, ' +
-      'falder din pris fra ' + kr(DEPOSIT.amount) + ' til ' + kr(DEPOSIT.amount - n * d);  // "kr." ends the sentence
+      'Når du har sikret din plads, kan du dele dit personlige link. For hver person, der sikrer sin plads via ' +
+      'det, får du ' + kr(d) + ' tilbage ved lancering, og beløbene lægges sammen. Henviser du fx ' + n +
+      ' personer, koster din test kun ' + kr(DEPOSIT.amount - n * d);  // "kr." ends the sentence
   }
 
   function setupShare() {
-    var url = buildShareUrl();
     if (navigator.share) {
       shareBtn.hidden = false;
       shareBtn.onclick = function () {
-        navigator.share({ title: 'Revigora', text: SHARE_TEXT, url: url }).catch(function () {});
+        // Built at click time, when the personal code is certainly ready.
+        navigator.share({ title: 'Revigora', text: SHARE_TEXT, url: buildShareUrl() }).catch(function () {});
       };
     } else {
       shareBtn.hidden = true;
